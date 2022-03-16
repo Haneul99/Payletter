@@ -3,7 +3,6 @@ package util
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -18,7 +17,6 @@ var ServerConfig = Config{}
 func (c *Config) LoadConfig() bool {
 	file, err := os.Open("util/setting.json")
 	if err != nil {
-		log.Fatal(err)
 		return false
 	}
 	defer file.Close()
