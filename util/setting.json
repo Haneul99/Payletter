@@ -1,0 +1,10 @@
+{
+    "DB_Name" : "ottsdb",
+    "DB_LoginID" : "haneuljeong",
+    "DB_Password" : "Utplus80!",
+    "DB_IP" : "127.0.0.1",
+    "DB_Port" : "3306",
+
+    "Payletter_PAYMENT_API_KEY" : "MTFBNTAzNTEwNDAxQUIyMjlCQzgwNTg1MkU4MkZENDA=",
+    "Payletter_SEARCH_API_KEY" : "MUI3MjM0RUExQTgyRDA1ODZGRDUyOEM4OTY2QTVCN0Y="
+}

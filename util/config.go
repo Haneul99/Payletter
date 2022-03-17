@@ -14,18 +14,19 @@ type Config struct {
 
 var ServerConfig = Config{}
 
-func (c *Config) LoadConfig() bool {
+func (c *Config) LoadConfig() error {
 	file, err := os.Open("util/setting.json")
 	if err != nil {
-		return false
+		return err
 	}
 	defer file.Close()
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
-		return false
+		return err
 	}
 	err = json.Unmarshal(data, &c.systemEnv)
-	return err == nil
+
+	return err
 }
 
 func (c *Config) GetStringData(key string) string {

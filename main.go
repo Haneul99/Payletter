@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
+	handlers "Haneul99/Payletter/handlers/api"
 	"Haneul99/Payletter/util"
-	"database/sql"
-	//	"github.com/labstack/echo"
+
+	"github.com/labstack/echo/v4"
 )
 
 type ottservice struct {
@@ -17,69 +17,39 @@ type ottservice struct {
 	price        int64
 }
 
-var db *sql.DB
-
 func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello World\n")
 }
 
-// 데이터베이스 open
-func dbConnect() error {
-	var err error
-
-	dbURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
-		util.ServerConfig.GetStringData("DB_LoginID"),
-		util.ServerConfig.GetStringData("DB_Password"),
-		util.ServerConfig.GetStringData("DB_IP"),
-		util.ServerConfig.GetStringData("DB_Port"),
-		util.ServerConfig.GetStringData("DB_Name"))
-
-	db, err = sql.Open("mysql", dbURL)
-	if err != nil {
-		return err
-	}
-	fmt.Println("db connection success")
-	return nil
-
-}
-
-// OTTservices Table 정보 SELECT
-func getOTTservices() []ottservice {
-	query := fmt.Sprintf("SELECT * FROM %s", "ottservices")
-	fmt.Println(query)
-
-	rows, err := db.Query(query)
-	if err != nil {
-		fmt.Println(err, "db query failed")
-	}
-	defer rows.Close()
-
-	results := []ottservice{}
-
-	for rows.Next() {
-		var ott ottservice
-		err = rows.Scan(&ott.OTTserviceId, &ott.platform, &ott.membership, &ott.price)
-		if err != nil {
-			fmt.Println(err)
-		}
-		results = append(results, ott)
-	}
-	return results
-}
-
 func main() {
-	if !util.ServerConfig.LoadConfig() {
+	if util.ServerConfig.LoadConfig() != nil {
 		panic("설정파일 읽기 실패")
 	}
 
 	//fmt.Println(util.ServerConfig.GetData())
-	if dbConnect() != nil {
+	if util.DBConnect() != nil {
 		panic("DB connect 실패")
 	}
 
-	results := getOTTservices()
+	results, err := util.GetOTTservices()
+	if err != nil {
+		panic("SELECT DB 실패")
+	}
 	fmt.Println(results)
 
-	http.HandleFunc("/", index)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	e := echo.New()
+	e.GET("/", func(c echo.Context) error { return c.String(http.StatusOK, "Hello Worldddd\n") })
+	e.GET("/api/loadProdouctsList", handlers.LoadPlatformsList)
+	e.POST("/api/signUp", handlers.SignUp)
+	//apiHandlers()
+	e.Logger.Fatal(e.Start(":8080"))
 }
+
+/*
+func apiHandlers() {
+	e := echo.New()
+	e.GET("/", func(c echo.Context) error { return c.String(http.StatusOK, "Hello Worldddd\n") })
+	e.GET("/api/loadProdouctsList", handlers.LoadPlatformsList)
+	e.POST("/api/signUp", handlers.SignUp)
+}
+*/
