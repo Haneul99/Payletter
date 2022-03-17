@@ -23,6 +23,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello World\n")
 }
 
+// 데이터베이스 open
 func dbConnect() {
 	var err error
 
