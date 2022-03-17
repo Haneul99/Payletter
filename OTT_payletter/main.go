@@ -24,7 +24,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 // 데이터베이스 open
-func dbConnect() {
+func dbConnect() error {
 	var err error
 
 	dbURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
@@ -36,10 +36,11 @@ func dbConnect() {
 
 	db, err = sql.Open("mysql", dbURL)
 	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("db connection success")
+		return err
 	}
+	fmt.Println("db connection success")
+	return nil
+
 }
 
 // OTTservices Table 정보 SELECT
@@ -72,7 +73,9 @@ func main() {
 	}
 
 	//fmt.Println(util.ServerConfig.GetData())
-	dbConnect()
+	if dbConnect() != nil {
+		panic("DB connect 실패")
+	}
 
 	results := getOTTservices()
 	fmt.Println(results)

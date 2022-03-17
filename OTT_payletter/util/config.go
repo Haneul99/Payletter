@@ -20,11 +20,11 @@ func (c *Config) LoadConfig() bool {
 		return false
 	}
 	defer file.Close()
-	byteValue, err := ioutil.ReadAll(file)
+	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		return false
 	}
-	err = json.Unmarshal(byteValue, &c.systemEnv)
+	err = json.Unmarshal(data, &c.systemEnv)
 	return err == nil
 }
 
