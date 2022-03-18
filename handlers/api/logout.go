@@ -9,12 +9,12 @@ import (
 )
 
 type LogoutInfo struct {
-	Username    string `json: "username"`
-	AccessToken string `json: "accessToken"`
+	Username    string `json:"username"`
+	AccessToken string `json:"accessToken"`
 }
 
 type ResLogout struct {
-	Success bool `json: "success"`
+	Success bool `json:"success"`
 }
 
 func Logout(c echo.Context) error {

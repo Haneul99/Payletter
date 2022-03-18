@@ -9,14 +9,14 @@ import (
 )
 
 type LoginInfo struct {
-	Username string `json: "username"`
-	Password string `json: "password"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type ResLogin struct {
-	Success     bool   `json: "success"`
-	Username    string `json: "username"`
-	AccessToken string `json: "AccessToken"`
+	Success     bool   `json:"success"`
+	Username    string `json:"username"`
+	AccessToken string `json:"AccessToken"`
 }
 
 func Login(c echo.Context) error {

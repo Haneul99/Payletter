@@ -8,16 +8,16 @@ import (
 )
 
 type ReqRequestPay struct {
-	OTTserviceId int    `json: "OTTserviceId"`
-	Platform     string `json: "platform`
-	Membership   string `json: "membership"`
-	Price        int    `json: "price"`
+	OTTserviceId int    `json:"OTTserviceId"`
+	Platform     string `json:"platform"`
+	Membership   string `json:"membership"`
+	Price        int    `json:"price"`
 	Username     string `json:"username"`
 	AccessToken  string `json:"accessToken"`
 }
 
 type ResRequestPay struct {
-	Success bool `json: "success`
+	Success bool `json:"success"`
 }
 
 func ReqestPay(c echo.Context) error {

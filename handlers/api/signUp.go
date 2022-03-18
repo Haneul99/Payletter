@@ -18,7 +18,7 @@ type User struct {
 
 type ResSignUp struct {
 	Success  bool   `json:"success"`
-	Username string `json: "username"`
+	Username string `json:"username"`
 }
 
 func SignUp(c echo.Context) error {

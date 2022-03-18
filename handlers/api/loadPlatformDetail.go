@@ -9,15 +9,15 @@ import (
 )
 
 type PlatformDetail struct {
-	OTTserviceId int    `json: "OTTserviceId"`
-	Platform     string `json: "platform`
-	Membership   string `json: "membership"`
-	Price        int    `json: "price"`
+	OTTserviceId int    `json:"OTTserviceId"`
+	Platform     string `json:"platform"`
+	Membership   string `json:"membership"`
+	Price        int    `json:"price"`
 }
 
 type ResLoadPlatformDetail struct {
-	Success  bool             `json: "success"`
-	Contents []PlatformDetail `json: "contents"`
+	Success  bool             `json:"success"`
+	Contents []PlatformDetail `json:"contents"`
 }
 
 func LoadPlatformDetail(c echo.Context) error {

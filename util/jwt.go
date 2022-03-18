@@ -8,7 +8,7 @@ import (
 )
 
 type JWTtoken struct {
-	Token string `json: "token"`
+	Token string `json:"token"`
 }
 
 type AccessTokenClaims struct {

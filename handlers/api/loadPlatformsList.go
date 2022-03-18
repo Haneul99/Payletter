@@ -10,12 +10,12 @@ import (
 )
 
 type Product struct {
-	Platform string `json: "platform"`
+	Platform string `json:"platform"`
 }
 
 type ResLoadPlatFormsList struct {
-	Success  bool     `json: "success`
-	Contents []string `json: "contents"`
+	Success  bool     `json:"success"`
+	Contents []string `json:"contents"`
 }
 
 // Product
