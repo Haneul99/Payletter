@@ -31,7 +31,7 @@ func SignUp(c echo.Context) error {
 
 	isAvailable, err := checkValidity(user)
 	if !isAvailable || err != nil {
-		return err // 실패 response return 할 것
+		return c.JSON(http.StatusBadRequest, "중복된 아이디") // 실패 response return 할 것
 	}
 
 	if err := insertUserDB(user); err != nil {
@@ -73,17 +73,14 @@ func checkIdUnique(username string) (bool, error) {
 // INSERT USER DB
 func insertUserDB(user User) error {
 	var key = []byte("thisis32bitlongpassphraseimusing")
-	a, err := util.NewAesCipher(key)
+	aes, err := util.NewAesCipher(key)
 
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
-	encryptedPassword := a.EncryptString(user.Password) // 비밀번호 암호와
-	//d := a.DecryptString(e) // 복호화된 비밀번호
-	// rows, err := util.GetDB().Query(query)
-	query := fmt.Sprintf("INSERT INTO USER(username, password, email) VALUE(\"%s\", \"%s\", \"%s\")", user.Username, encryptedPassword, user.Email)
+	encryptedPwd := aes.EncryptString(user.Password) // 비밀번호 암호와
+	query := fmt.Sprintf("INSERT INTO USER(username, password, email) VALUE(\"%s\", \"%s\", \"%s\")", user.Username, encryptedPwd, user.Email)
 	_, err = util.GetDB().Exec(query)
 	if err != nil {
 		fmt.Println(err)

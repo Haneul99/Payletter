@@ -24,7 +24,7 @@ func LoadPlatformsList(c echo.Context) error {
 	resLoadPlatFormsList := ResLoadPlatFormsList{}
 	results := SelectPlatformList()
 	if results == nil {
-		return echo.NewHTTPError(http.StatusBadRequest) // 임시
+		return c.JSON(http.StatusBadRequest, "failed") // 임시
 	}
 	for _, value := range results {
 		resLoadPlatFormsList.Contents = append(resLoadPlatFormsList.Contents, value.Platform)
