@@ -38,18 +38,16 @@ func main() {
 	fmt.Println(results)
 
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error { return c.String(http.StatusOK, "Hello Worldddd\n") })
-	e.GET("/api/loadProdouctsList", handlers.LoadPlatformsList)
-	e.POST("/api/signUp", handlers.SignUp)
-	//apiHandlers()
+
+	apiHandlers(e)
+
 	e.Logger.Fatal(e.Start(":8080"))
 }
 
-/*
-func apiHandlers() {
-	e := echo.New()
+func apiHandlers(e *echo.Echo) {
 	e.GET("/", func(c echo.Context) error { return c.String(http.StatusOK, "Hello Worldddd\n") })
 	e.GET("/api/loadProdouctsList", handlers.LoadPlatformsList)
 	e.POST("/api/signUp", handlers.SignUp)
+	e.GET("/api/loadPlatformDetail", handlers.LoadPlatformDetail)
+	e.POST("/api/requestPay", handlers.ReqestPay)
 }
-*/

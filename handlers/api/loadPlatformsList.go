@@ -13,21 +13,30 @@ type Product struct {
 	Platform string `json: "platform"`
 }
 
+type ResLoadPlatFormsList struct {
+	Success  bool     `json: "success`
+	Message  string   `json: "message"`
+	Contents []string `json: "contents"`
+}
+
 // Product
 func LoadPlatformsList(c echo.Context) error {
+	resLoadPlatFormsList := ResLoadPlatFormsList{}
 	results := SelectPlatformList()
-	fmt.Println(results)
-	str := ""
-	for _, value := range results {
-		str += value.Platform + " "
+	if results == nil {
+		return echo.NewHTTPError(http.StatusBadRequest) // 임시
 	}
-	return c.String(http.StatusOK, str)
+	for _, value := range results {
+		resLoadPlatFormsList.Contents = append(resLoadPlatFormsList.Contents, value.Platform)
+	}
+	resLoadPlatFormsList.Success = true
+	resLoadPlatFormsList.Message = "Load Platform Lists"
+	return c.JSON(http.StatusOK, resLoadPlatFormsList)
 }
 
 // Platform 정보 SELECT
 func SelectPlatformList() []Product {
 	query := fmt.Sprintf("SELECT DISTINCT platform FROM %s", "ottservices")
-	fmt.Println(query)
 	rows, err := util.GetDB().Query(query)
 	if err != nil {
 		return nil

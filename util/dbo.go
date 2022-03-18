@@ -63,3 +63,13 @@ func GetDB() *sql.DB {
 	}
 	return nil
 }
+
+// 테이블 전체 값 SELECT
+func SelectAll(table string) {
+
+}
+
+// 테이블 중 하나의 COLUMN SELECT
+func SelectOneColumn(table, target string) {
+
+}
