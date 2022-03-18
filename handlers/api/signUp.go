@@ -18,7 +18,6 @@ type User struct {
 
 type ResSignUp struct {
 	Success  bool   `json:"success"`
-	Message  string `json: "message"`
 	Username string `json: "username"`
 }
 
@@ -29,8 +28,7 @@ func SignUp(c echo.Context) error {
 		return err
 	}
 
-	isAvailable, err := checkValidity(user)
-	if !isAvailable || err != nil {
+	if isAvailable, err := checkSignUpValidity(user); !isAvailable || err != nil {
 		return c.JSON(http.StatusBadRequest, "중복된 아이디") // 실패 response return 할 것
 	}
 
@@ -39,13 +37,12 @@ func SignUp(c echo.Context) error {
 	}
 
 	resSignUp.Success = true
-	resSignUp.Message = "회원가입 성공"
 	resSignUp.Username = user.Username
 	return c.JSON(http.StatusOK, resSignUp)
 }
 
 // 유저가 입력한 정보가 가입 가능한 정보인지 체크
-func checkValidity(user User) (bool, error) {
+func checkSignUpValidity(user User) (bool, error) {
 	isAvailable, err := checkIdUnique(user.Username)
 	if err != nil {
 		return false, err
@@ -70,18 +67,10 @@ func checkIdUnique(username string) (bool, error) {
 	return true, nil
 }
 
-// INSERT USER DB
+// DB에 유저 정보 삽입
 func insertUserDB(user User) error {
-	var key = []byte("thisis32bitlongpassphraseimusing")
-	aes, err := util.NewAesCipher(key)
-
-	if err != nil {
-		return err
-	}
-
-	encryptedPwd := aes.EncryptString(user.Password) // 비밀번호 암호와
-	query := fmt.Sprintf("INSERT INTO USER(username, password, email) VALUE(\"%s\", \"%s\", \"%s\")", user.Username, encryptedPwd, user.Email)
-	_, err = util.GetDB().Exec(query)
+	query := fmt.Sprintf("INSERT INTO USER(username, password, email) VALUE(\"%s\", \"%s\", \"%s\")", user.Username, user.Password, user.Email)
+	_, err := util.GetDB().Exec(query)
 	if err != nil {
 		fmt.Println(err)
 		return err

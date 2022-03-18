@@ -17,8 +17,7 @@ type ReqRequestPay struct {
 }
 
 type ResRequestPay struct {
-	Success bool   `json: "success`
-	Message string `json: "message"`
+	Success bool `json: "success`
 }
 
 func ReqestPay(c echo.Context) error {
@@ -33,7 +32,6 @@ func ReqestPay(c echo.Context) error {
 
 	resRequestPay := ResRequestPay{}
 	resRequestPay.Success = true
-	resRequestPay.Message = "Request pay success"
 
 	return c.JSON(http.StatusOK, resRequestPay)
 }

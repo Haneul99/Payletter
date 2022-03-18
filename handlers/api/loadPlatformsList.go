@@ -15,7 +15,6 @@ type Product struct {
 
 type ResLoadPlatFormsList struct {
 	Success  bool     `json: "success`
-	Message  string   `json: "message"`
 	Contents []string `json: "contents"`
 }
 
@@ -30,7 +29,6 @@ func LoadPlatformsList(c echo.Context) error {
 		resLoadPlatFormsList.Contents = append(resLoadPlatFormsList.Contents, value.Platform)
 	}
 	resLoadPlatFormsList.Success = true
-	resLoadPlatFormsList.Message = "Load Platform Lists"
 	return c.JSON(http.StatusOK, resLoadPlatFormsList)
 }
 

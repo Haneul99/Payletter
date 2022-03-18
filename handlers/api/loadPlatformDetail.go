@@ -17,7 +17,6 @@ type PlatformDetail struct {
 
 type ResLoadPlatformDetail struct {
 	Success  bool             `json: "success"`
-	Message  string           `json: "message"`
 	Contents []PlatformDetail `json: "contents"`
 }
 
@@ -28,7 +27,6 @@ func LoadPlatformDetail(c echo.Context) error {
 	results := SelectPlatformDetail(platformName)
 
 	resLoadPlatformDetail.Success = true
-	resLoadPlatformDetail.Message = "Load Platform Details"
 	resLoadPlatformDetail.Contents = results
 
 	return c.JSON(http.StatusOK, resLoadPlatformDetail)
@@ -37,7 +35,6 @@ func LoadPlatformDetail(c echo.Context) error {
 // Platform 정보 SELECT
 func SelectPlatformDetail(platformName string) []PlatformDetail {
 	query := fmt.Sprintf("SELECT * FROM %s WHERE platform = \"%s\"", "ottservices", platformName)
-	fmt.Println(query)
 	rows, err := util.GetDB().Query(query)
 	if err != nil {
 		return nil
