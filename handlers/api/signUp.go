@@ -45,6 +45,9 @@ func checkParam(user ReqSignUp) (bool, error) {
 		return false, fmt.Errorf(ERR_DUPLICATE_ID)
 	}
 	// password가 빈 값인지 확인
+	if isNull, err := checkParamPassword(user.Password); isNull || err != nil {
+		return false, fmt.Errorf("ERR_SIGNUP_NULL_PASSWORD") // 받아온 err 값을 return 하도록 수정 필요.
+	}
 	return true, nil
 }
 
@@ -61,8 +64,11 @@ func checkParamId(username string) (bool, error) {
 	return true, nil
 }
 
-func checkParamPassword() {
-
+func checkParamPassword(password string) (bool, error) {
+	if len(password) == 0 {
+		return false, fmt.Errorf("ERR_SIGNUP_NULL_PASSWORD")
+	}
+	return true, nil
 }
 
 // DB에 유저 정보 삽입
