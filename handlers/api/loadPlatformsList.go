@@ -21,9 +21,9 @@ type ResLoadPlatFormsList struct {
 // Product
 func LoadPlatformsList(c echo.Context) error {
 	resLoadPlatFormsList := ResLoadPlatFormsList{}
-	results := SelectPlatformList()
+	results := selectPlatformList()
 	if results == nil {
-		return c.JSON(http.StatusBadRequest, "failed") // 임시
+		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_SELECT_DB})
 	}
 	for _, value := range results {
 		resLoadPlatFormsList.Contents = append(resLoadPlatFormsList.Contents, value.Platform)
@@ -33,7 +33,7 @@ func LoadPlatformsList(c echo.Context) error {
 }
 
 // Platform 정보 SELECT
-func SelectPlatformList() []Product {
+func selectPlatformList() []Product {
 	query := fmt.Sprintf("SELECT DISTINCT platform FROM %s", "ottservices")
 	rows, err := util.GetDB().Query(query)
 	if err != nil {
@@ -45,8 +45,7 @@ func SelectPlatformList() []Product {
 
 	for rows.Next() {
 		var platform Product
-		err = rows.Scan(&platform.Platform)
-		if err != nil {
+		if err = rows.Scan(&platform.Platform); err != nil {
 			return nil
 		}
 		results = append(results, platform)

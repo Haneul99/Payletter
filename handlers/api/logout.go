@@ -21,25 +21,17 @@ func Logout(c echo.Context) error {
 	logoutInfo := LogoutInfo{}
 	resLogout := ResLogout{}
 	if err := c.Bind(&logoutInfo); err != nil {
-		fmt.Println(err)
-		return err
+		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_REQUEST_BINDING})
 	}
 
 	// 해당 accessToken이 유효한지 검사
 	// 해당 accessToken이 DB에 저장된 것과 동일한지 검사
-	isValid, err := util.IsValidAccessToken(logoutInfo.AccessToken, logoutInfo.Username)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	if !isValid {
-		return c.JSON(http.StatusOK, "invalid accessToken")
+	if isValid, err := util.IsValidAccessToken(logoutInfo.AccessToken, logoutInfo.Username); !isValid || err != nil {
+		return c.JSON(http.StatusBadRequest, ResFail{ErrCode: false, Message: ERR_ACCESSTOKEN})
 	}
 
-	err = deleteUserAccessToken(logoutInfo.Username)
-	if err != nil {
-		fmt.Println(err)
-		return err
+	if err := deleteUserAccessToken(logoutInfo.Username); err != nil {
+		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_DELETE_DB})
 	}
 
 	resLogout.Success = true
@@ -51,7 +43,6 @@ func deleteUserAccessToken(username string) error {
 	query := fmt.Sprintf("UPDATE USER SET accessToken = \"\" WHERE username = \"%s\"", username)
 	_, err := util.GetDB().Exec(query)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 	return nil

@@ -23,10 +23,13 @@ func main() {
 }
 
 func apiHandlers(e *echo.Echo) {
-	e.GET("/api/loadProdouctsList", handlers.LoadPlatformsList)
+	e.GET("/api/loadPlatformsList", handlers.LoadPlatformsList)
 	e.GET("/api/loadPlatformDetail", handlers.LoadPlatformDetail)
 	e.POST("/api/signUp", handlers.SignUp)
-	e.POST("/api/requestPay", handlers.ReqestPay)
 	e.POST("/api/login", handlers.Login)
 	e.POST("/api/logout", handlers.Logout)
+	e.POST("/api/loadPersonalData", handlers.LoadPersonalData)
+	e.POST("/api/loadSubscribingData", handlers.LoadSubscribingData)
+	e.POST("/api/requestPay", handlers.RequestPay)
+	e.POST("/api/requestCancel", handlers.RequestCancel)
 }

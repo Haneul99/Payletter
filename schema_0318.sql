@@ -14,6 +14,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema OTTsdb
 -- -----------------------------------------------------
+DROP SCHEMA IF EXISTS `OTTsdb`;
 CREATE SCHEMA IF NOT EXISTS `OTTsdb` DEFAULT CHARACTER SET utf8 ;
 USE `OTTsdb` ;
 
@@ -48,19 +49,13 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `OTTsdb`.`subscribedServices` (
   `subscribedServiceId` INT(64) NOT NULL AUTO_INCREMENT,
-  `userId` INT(64) NOT NULL,
+  `username` VARCHAR(45) NOT NULL,
   `OTTServiceId` INT(64) NOT NULL,
   `subscribedDate` DATE NOT NULL,
   `expireDate` DATE NOT NULL,
   `paymentType` INT(64) NOT NULL,
   PRIMARY KEY (`subscribedServiceId`),
-  INDEX `fk_subscribedServices_userId_idx` (`userId` ASC) VISIBLE,
   INDEX `fk_subscribedService_OTTServiceId_idx` (`OTTServiceId` ASC) VISIBLE,
-  CONSTRAINT `fk_subscribedServices_userId`
-    FOREIGN KEY (`userId`)
-    REFERENCES `OTTsdb`.`user` (`userId`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
   CONSTRAINT `fk_subscribedService_OTTServiceId`
     FOREIGN KEY (`OTTServiceId`)
     REFERENCES `OTTsdb`.`OTTServices` (`OTTservicesId`)

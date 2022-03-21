@@ -24,7 +24,11 @@ func LoadPlatformDetail(c echo.Context) error {
 	platformName := c.QueryParam("platform")
 
 	resLoadPlatformDetail := ResLoadPlatformDetail{}
-	results := SelectPlatformDetail(platformName)
+	results := selectPlatformDetail(platformName)
+
+	if results == nil {
+		return c.JSON(http.StatusBadRequest, ResFail{ErrCode: 0, Message: ERR_SELECT_DB})
+	}
 
 	resLoadPlatformDetail.Success = true
 	resLoadPlatformDetail.Contents = results
@@ -33,7 +37,7 @@ func LoadPlatformDetail(c echo.Context) error {
 }
 
 // Platform 정보 SELECT
-func SelectPlatformDetail(platformName string) []PlatformDetail {
+func selectPlatformDetail(platformName string) []PlatformDetail {
 	query := fmt.Sprintf("SELECT * FROM %s WHERE platform = \"%s\"", "ottservices", platformName)
 	rows, err := util.GetDB().Query(query)
 	if err != nil {
@@ -45,8 +49,7 @@ func SelectPlatformDetail(platformName string) []PlatformDetail {
 
 	for rows.Next() {
 		var platformDetail PlatformDetail
-		err = rows.Scan(&platformDetail.OTTserviceId, &platformDetail.Platform, &platformDetail.Membership, &platformDetail.Price)
-		if err != nil {
+		if err = rows.Scan(&platformDetail.OTTserviceId, &platformDetail.Platform, &platformDetail.Membership, &platformDetail.Price); err != nil {
 			return nil
 		}
 		results = append(results, platformDetail)

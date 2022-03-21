@@ -34,8 +34,29 @@ func CreateJWTAccessToken(username string) (string, error) {
 	return tk, nil
 }
 
+// 유효한 accessToken인지 검사
+func IsValidAccessToken(accessToken, username string) (bool, error) {
+	isValid, err := decodeJWT(accessToken)
+	if err != nil {
+		return false, err
+	}
+	if !isValid {
+		return false, nil
+	}
+
+	isStored, err := isStoredAccessToken(accessToken, username)
+	if err != nil {
+		return false, err
+	}
+	if !isStored {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 // JWT Token 검증
-func DecodeJWT(accessToken string) (bool, error) {
+func decodeJWT(accessToken string) (bool, error) {
 	if accessToken == "" {
 		fmt.Println("token is null")
 		return false, nil
@@ -57,7 +78,7 @@ func DecodeJWT(accessToken string) (bool, error) {
 }
 
 // 저장되어 있는 accessToken이 일치하는지 검사
-func IsStoredAccessToken(accessToken, username string) (bool, error) {
+func isStoredAccessToken(accessToken, username string) (bool, error) {
 	query := fmt.Sprintf("SELECT accessToken From USER WHERE username = \"%s\"", username)
 	var storedTK = ""
 	err := GetDB().QueryRow(query).Scan(&storedTK)
@@ -67,26 +88,5 @@ func IsStoredAccessToken(accessToken, username string) (bool, error) {
 	if storedTK != accessToken {
 		return false, nil
 	}
-	return true, nil
-}
-
-// 유효한 accessToken인지 검사
-func IsValidAccessToken(accessToken, username string) (bool, error) {
-	isValid, err := DecodeJWT(accessToken)
-	if err != nil {
-		return false, err
-	}
-	if !isValid {
-		return false, nil
-	}
-
-	isStored, err := IsStoredAccessToken(accessToken, username)
-	if err != nil {
-		return false, err
-	}
-	if !isStored {
-		return false, nil
-	}
-
 	return true, nil
 }

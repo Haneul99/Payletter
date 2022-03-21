@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"errors"
+	"Haneul99/Payletter/util"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -20,15 +20,17 @@ type ResRequestPay struct {
 	Success bool `json:"success"`
 }
 
-func ReqestPay(c echo.Context) error {
+func RequestPay(c echo.Context) error {
 	reqRequestPay := ReqRequestPay{}
 	if err := c.Bind(&reqRequestPay); err != nil {
-		return err
+		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_REQUEST_BINDING})
 	}
-	if err := checkPayRequestValidity(); err != nil {
-		return c.JSON(http.StatusBadRequest, "request failure")
+
+	if isValid, err := util.IsValidAccessToken(reqRequestPay.AccessToken, reqRequestPay.Username); !isValid || err != nil {
+		return c.JSON(http.StatusUnauthorized, ResFail{ErrCode: false, Message: ERR_ACCESSTOKEN})
 	}
-	callPayletter()
+
+	requestPayPayletter()
 
 	resRequestPay := ResRequestPay{}
 	resRequestPay.Success = true
@@ -37,10 +39,6 @@ func ReqestPay(c echo.Context) error {
 }
 
 // Payletter 결제요청 api 호출
-func callPayletter() {
+func requestPayPayletter() {
 
-}
-
-func checkPayRequestValidity() error {
-	return errors.New("failure") // failure test
 }
