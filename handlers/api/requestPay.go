@@ -3,6 +3,8 @@ package handlers
 import (
 	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -18,7 +20,9 @@ type ReqRequestPay struct {
 }
 
 type ResRequestPay struct {
-	ErrCode int `json:"errCode"`
+	ErrCode   int    `json:"errCode"`
+	OnlineURL string `json:"online_url"`
+	MobileURL string `json:"mobile_url"`
 }
 
 func RequestPay(c echo.Context) error {
@@ -31,15 +35,18 @@ func RequestPay(c echo.Context) error {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 
-	requestPayPayletter()
+	respBody, errCode, err := util.RequestPayletterAPI(http.MethodPost, "v1.0/payments/request", reqRequestPay.Username, reqRequestPay.Price, reqRequestPay.Platform, reqRequestPay.Membership)
+	if err != nil {
+		handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
+	}
+	fmt.Println(string(respBody))
 
 	resRequestPay := ResRequestPay{}
+	err = json.Unmarshal(respBody, &resRequestPay)
+	if err != nil {
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_REQUEST_PAY_JSON_UNMARSHAL)
+	}
 	resRequestPay.ErrCode = 0
 
 	return c.JSON(http.StatusOK, resRequestPay)
-}
-
-// Payletter 결제요청 api 호출
-func requestPayPayletter() {
-
 }

@@ -36,12 +36,3 @@ func (c *Config) GetStringData(key string) string {
 	}
 	return val
 }
-
-// systemEnv의 data 조회
-func (c *Config) GetData() map[string]string {
-	retData := make(map[string]string)
-	for key, val := range c.systemEnv {
-		retData[key] = val
-	}
-	return retData
-}

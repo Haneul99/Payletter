@@ -12,7 +12,6 @@ func main() {
 		panic("설정파일 읽기 실패")
 	}
 
-	//fmt.Println(util.ServerConfig.GetData())
 	if util.DBConnect() != nil {
 		panic("DB connect 실패")
 	}
@@ -32,4 +31,5 @@ func apiHandlers(e *echo.Echo) {
 	e.POST("/api/loadSubscribingData", handlers.LoadSubscribingData)
 	e.POST("/api/requestPay", handlers.RequestPay)
 	e.POST("/api/requestCancel", handlers.RequestCancel)
+	e.POST("/api/payletterResult", handlers.PayletterResult)
 }

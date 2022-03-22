@@ -65,10 +65,14 @@ const (
 	// RequestPay api 처리 시 발생 에러
 	ERR_REQUEST_PAY_REQUEST_BINDING     = 10700 // RequestPay 데이터 바인딩 에러
 	ERR_REQUEST_PAY_INVALID_ACCESSTOKEN = 10701 // DB 정보와 일치하지 않는 AccessToken
+	ERR_REQUEST_PAY_JSON_UNMARSHAL      = 10702 // JSON Unmarshal Error
 
 	// RequestCancel api 처리 시 발생 에러
 	ERR_REQUEST_CANCEL_REQUEST_BINDING     = 10800 // RequestCancel 데이터 바인딩 에러
 	ERR_REQUEST_CANCEL_INVALID_ACCESSTOKEN = 10801 // DB 정보와 일치하지 않는 AccessToken
+
+	// payletterResult api 처리 시 발생 에러
+	ERR_PAYLETTER_RESULT_REQUEST_BINDING = 10900
 
 	// jwt.go Error
 	ERR_JWT_CREATE_ACCESSTOKEN    = 20000
@@ -76,4 +80,10 @@ const (
 	ERR_JWT_INVALID_ACCESSTOKEN   = 20002
 	ERR_JWT_GET_DB                = 20003
 	ERR_JWT_INCORRECT_ACCESSTOKEN = 20004
+
+	// payletter.go Error
+	ERR_PAYLETTER_JSON_MARSHAL   = 20100
+	ERR_PAYLETTER_NEW_REQUEST    = 20101
+	ERR_PAYLETTER_CLIENT_DO      = 20102
+	ERR_PAYLETTER_IOUTIL_READALL = 20103
 )
