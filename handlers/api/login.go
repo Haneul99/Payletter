@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
 	"fmt"
 	"net/http"
@@ -14,7 +15,7 @@ type ReqLogin struct {
 }
 
 type ResLogin struct {
-	Success     bool   `json:"success"`
+	ErrCode     int    `json:"errCode"`
 	Username    string `json:"username"`
 	AccessToken string `json:"accessToken"`
 }
@@ -23,48 +24,50 @@ func Login(c echo.Context) error {
 	resLogin := ResLogin{}
 	reqLogin := ReqLogin{}
 	if err := c.Bind(&reqLogin); err != nil {
-		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_REQUEST_BINDING})
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_LOGIN_REQUEST_BINDING)
 	}
 
 	// 비밀번호 오류
-	if pwd, err := getUserPwd(reqLogin); pwd != reqLogin.Password || err != nil {
-		resLogin.Success = false
-		return c.JSON(http.StatusBadRequest, ResFail{ErrCode: false, Message: ERR_INCORRECT_PASSWORD})
+	pwd, errCode, err := getUserPwd(reqLogin)
+	if pwd != reqLogin.Password || err != nil {
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
+	}
+	if pwd != reqLogin.Password {
+		return handleError.ReturnResFail(c, http.StatusBadRequest, err, errCode)
 	}
 
-	accessToken, err := util.CreateJWTAccessToken(reqLogin.Username)
+	accessToken, errCode, err := util.CreateJWTAccessToken(reqLogin.Username)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_ACCESSTOKEN})
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 
 	// DB에 AccessToken 삽입
-	err = insertUserAccessToken(accessToken, reqLogin.Username)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_INSERT_DB})
+	if errCode, err := insertUserAccessToken(accessToken, reqLogin.Username); err != nil {
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 
 	resLogin.AccessToken = accessToken
-	resLogin.Success = true
+	resLogin.ErrCode = 0
 	resLogin.Username = reqLogin.Username
 
 	return c.JSON(http.StatusOK, resLogin)
 }
 
-func getUserPwd(reqLogin ReqLogin) (string, error) {
+func getUserPwd(reqLogin ReqLogin) (string, int, error) {
 	query := fmt.Sprintf("SELECT password FROM USER WHERE username = \"%s\"", reqLogin.Username)
 	var password = ""
 	err := util.GetDB().QueryRow(query).Scan(&password)
 	if err != nil {
-		return "", err
+		return "", handleError.ERR_JWT_GET_DB, err
 	}
-	return password, nil
+	return password, 0, nil
 }
 
-func insertUserAccessToken(token, username string) error {
+func insertUserAccessToken(token, username string) (int, error) {
 	query := fmt.Sprintf("UPDATE USER SET accessToken = \"%s\" WHERE username = \"%s\"", token, username)
 	_, err := util.GetDB().Exec(query)
 	if err != nil {
-		return err
+		return handleError.ERR_JWT_GET_DB, err
 	}
-	return nil
+	return 0, nil
 }

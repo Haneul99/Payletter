@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
 	"net/http"
 
@@ -18,8 +19,8 @@ type ReqRequestCancel struct {
 }
 
 type ResRequestCancel struct {
-	Success    bool `json:"success"`
-	CanceledId int  `json:"canceledId"`
+	ErrCode    int `json:"errCode"`
+	CanceledId int `json:"canceledId"`
 }
 
 func RequestCancel(c echo.Context) error {
@@ -27,17 +28,17 @@ func RequestCancel(c echo.Context) error {
 	resRequestCancel := ResRequestCancel{}
 
 	if err := c.Bind(&reqRequestCancel); err != nil {
-		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_REQUEST_BINDING})
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_REQUEST_CANCEL_REQUEST_BINDING)
 	}
 
-	if isValid, err := util.IsValidAccessToken(reqRequestCancel.AccessToken, reqRequestCancel.Username); !isValid || err != nil {
-		return c.JSON(http.StatusUnauthorized, ResFail{ErrCode: false, Message: ERR_ACCESSTOKEN})
+	if isValid, errCode, err := util.IsValidAccessToken(reqRequestCancel.AccessToken, reqRequestCancel.Username); !isValid || err != nil {
+		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 
 	//Payletter cancel API 호출
 	requestCancelPayletter()
 
-	resRequestCancel.Success = true
+	resRequestCancel.ErrCode = 0
 	resRequestCancel.CanceledId = reqRequestCancel.SubscribedOTTId
 	return c.JSON(http.StatusOK, resRequestCancel)
 }

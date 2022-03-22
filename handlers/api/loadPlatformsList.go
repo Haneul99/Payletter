@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	handleError "Haneul99/Payletter/handlers/error"
 	"fmt"
 	"net/http"
 
@@ -14,30 +15,29 @@ type Product struct {
 }
 
 type ResLoadPlatFormsList struct {
-	Success  bool     `json:"success"`
+	ErrCode  int      `json:"errCode"`
 	Contents []string `json:"contents"`
 }
 
-// Product
 func LoadPlatformsList(c echo.Context) error {
 	resLoadPlatFormsList := ResLoadPlatFormsList{}
-	results := selectPlatformList()
-	if results == nil {
-		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_SELECT_DB})
+	results, errCode, err := selectPlatformList()
+	if err != nil {
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 	for _, value := range results {
 		resLoadPlatFormsList.Contents = append(resLoadPlatFormsList.Contents, value.Platform)
 	}
-	resLoadPlatFormsList.Success = true
+	resLoadPlatFormsList.ErrCode = 0
 	return c.JSON(http.StatusOK, resLoadPlatFormsList)
 }
 
 // Platform 정보 SELECT
-func selectPlatformList() []Product {
+func selectPlatformList() ([]Product, int, error) {
 	query := fmt.Sprintf("SELECT DISTINCT platform FROM %s", "ottservices")
 	rows, err := util.GetDB().Query(query)
 	if err != nil {
-		return nil
+		return nil, handleError.ERR_LOAD_PLATFORMS_LIST_GET_DB, err
 	}
 	defer rows.Close()
 
@@ -46,9 +46,9 @@ func selectPlatformList() []Product {
 	for rows.Next() {
 		var platform Product
 		if err = rows.Scan(&platform.Platform); err != nil {
-			return nil
+			return nil, handleError.ERR_LOAD_PLATFORMS_LIST_SELECT_DB, err
 		}
 		results = append(results, platform)
 	}
-	return results
+	return results, 0, nil
 }

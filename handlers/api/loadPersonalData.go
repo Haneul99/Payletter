@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
 	"fmt"
 	"net/http"
@@ -19,7 +20,7 @@ type User struct {
 }
 
 type ResLoadPersonalData struct {
-	Success  bool `json:"success"`
+	ErrCode  int  `json:"errCode"`
 	Contents User `json:"contents"`
 }
 
@@ -27,26 +28,28 @@ func LoadPersonalData(c echo.Context) error {
 	resLoadPersonalData := ResLoadPersonalData{}
 	reqLoadPeronsalData := ReqLoadPeronsalData{}
 	if err := c.Bind(&reqLoadPeronsalData); err != nil {
-		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: 0, Message: ERR_REQUEST_BINDING})
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_LOAD_PERSONAL_DATA_REQUEST_BINDING)
 	}
 
-	if isValid, err := util.IsValidAccessToken(reqLoadPeronsalData.AccessToken, reqLoadPeronsalData.Username); !isValid || err != nil {
-		return c.JSON(http.StatusUnauthorized, ResFail{ErrCode: 0, Message: ERR_ACCESSTOKEN})
+	if isValid, errCode, err := util.IsValidAccessToken(reqLoadPeronsalData.AccessToken, reqLoadPeronsalData.Username); !isValid || err != nil {
+		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 
-	if personalData, err := getPersonalData(reqLoadPeronsalData); err != nil {
-		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: 0, Message: ERR_ACCESSTOKEN})
+	if personalData, errCode, err := getPersonalData(reqLoadPeronsalData); err != nil {
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	} else {
 		resLoadPersonalData.Contents = personalData
 	}
 
-	resLoadPersonalData.Success = true
+	resLoadPersonalData.ErrCode = 0
 	return c.JSON(http.StatusOK, resLoadPersonalData)
 }
 
-func getPersonalData(user ReqLoadPeronsalData) (User, error) {
+func getPersonalData(user ReqLoadPeronsalData) (User, int, error) {
 	personalData := User{}
 	query := fmt.Sprintf("SELECT username, email FROM USER WHERE username = \"%s\"", user.Username)
-	err := util.GetDB().QueryRow(query).Scan(&personalData.Username, &personalData.Email)
-	return personalData, err
+	if err := util.GetDB().QueryRow(query).Scan(&personalData.Username, &personalData.Email); err != nil {
+		return personalData, handleError.ERR_JWT_GET_DB, err
+	}
+	return personalData, 0, nil
 }

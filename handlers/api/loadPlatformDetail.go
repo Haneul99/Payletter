@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
 	"fmt"
 	"net/http"
@@ -16,7 +17,7 @@ type PlatformDetail struct {
 }
 
 type ResLoadPlatformDetail struct {
-	Success  bool             `json:"success"`
+	ErrCode  int              `json:"errCode"`
 	Contents []PlatformDetail `json:"contents"`
 }
 
@@ -24,24 +25,24 @@ func LoadPlatformDetail(c echo.Context) error {
 	platformName := c.QueryParam("platform")
 
 	resLoadPlatformDetail := ResLoadPlatformDetail{}
-	results := selectPlatformDetail(platformName)
+	results, errCode, err := selectPlatformDetail(platformName)
 
-	if results == nil {
-		return c.JSON(http.StatusBadRequest, ResFail{ErrCode: 0, Message: ERR_SELECT_DB})
+	if err != nil {
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 
-	resLoadPlatformDetail.Success = true
+	resLoadPlatformDetail.ErrCode = 0
 	resLoadPlatformDetail.Contents = results
 
 	return c.JSON(http.StatusOK, resLoadPlatformDetail)
 }
 
 // Platform 정보 SELECT
-func selectPlatformDetail(platformName string) []PlatformDetail {
+func selectPlatformDetail(platformName string) ([]PlatformDetail, int, error) {
 	query := fmt.Sprintf("SELECT * FROM %s WHERE platform = \"%s\"", "ottservices", platformName)
 	rows, err := util.GetDB().Query(query)
 	if err != nil {
-		return nil
+		return nil, handleError.ERR_JWT_GET_DB, err
 	}
 	defer rows.Close()
 
@@ -50,9 +51,9 @@ func selectPlatformDetail(platformName string) []PlatformDetail {
 	for rows.Next() {
 		var platformDetail PlatformDetail
 		if err = rows.Scan(&platformDetail.OTTserviceId, &platformDetail.Platform, &platformDetail.Membership, &platformDetail.Price); err != nil {
-			return nil
+			return nil, handleError.ERR_LOAD_PLATFORM_DETAIL_SELECT_DB, err
 		}
 		results = append(results, platformDetail)
 	}
-	return results
+	return results, 0, nil
 }

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
 	"net/http"
 
@@ -17,23 +18,23 @@ type ReqRequestPay struct {
 }
 
 type ResRequestPay struct {
-	Success bool `json:"success"`
+	ErrCode int `json:"errCode"`
 }
 
 func RequestPay(c echo.Context) error {
 	reqRequestPay := ReqRequestPay{}
 	if err := c.Bind(&reqRequestPay); err != nil {
-		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_REQUEST_BINDING})
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_REQUEST_PAY_REQUEST_BINDING)
 	}
 
-	if isValid, err := util.IsValidAccessToken(reqRequestPay.AccessToken, reqRequestPay.Username); !isValid || err != nil {
-		return c.JSON(http.StatusUnauthorized, ResFail{ErrCode: false, Message: ERR_ACCESSTOKEN})
+	if isValid, errCode, err := util.IsValidAccessToken(reqRequestPay.AccessToken, reqRequestPay.Username); !isValid || err != nil {
+		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 
 	requestPayPayletter()
 
 	resRequestPay := ResRequestPay{}
-	resRequestPay.Success = true
+	resRequestPay.ErrCode = 0
 
 	return c.JSON(http.StatusOK, resRequestPay)
 }

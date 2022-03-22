@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	handleError "Haneul99/Payletter/handlers/error"
 	"fmt"
 	"net/http"
 
@@ -23,7 +24,7 @@ type OttService struct {
 }
 
 type ResLoadSubscribingData struct {
-	Success  bool         `json:"success"`
+	ErrCode  int          `json:"errCode"`
 	Contents []OttService `json:"contents"`
 }
 
@@ -32,41 +33,41 @@ func LoadSubscribingData(c echo.Context) error {
 	resLoadSubscribingData := ResLoadSubscribingData{}
 
 	if err := c.Bind(&reqLoadSubscribingData); err != nil {
-		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_REQUEST_BINDING})
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_LOAD_SUBSCRIBING_DATA_REQUEST_BINDING)
 	}
 
-	if isValid, err := util.IsValidAccessToken(reqLoadSubscribingData.AccessToken, reqLoadSubscribingData.Username); !isValid || err != nil {
-		return c.JSON(http.StatusUnauthorized, ResFail{ErrCode: false, Message: ERR_ACCESSTOKEN})
+	if isValid, errCode, err := util.IsValidAccessToken(reqLoadSubscribingData.AccessToken, reqLoadSubscribingData.Username); !isValid || err != nil {
+		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 
-	if subscribed, err := getSubscribingData(ReqLoadPeronsalData(reqLoadSubscribingData)); err != nil {
-		return c.JSON(http.StatusInternalServerError, ResFail{ErrCode: false, Message: ERR_SELECT_DB})
+	if subscribed, errCode, err := getSubscribingData(ReqLoadPeronsalData(reqLoadSubscribingData)); err != nil {
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	} else {
 		resLoadSubscribingData.Contents = subscribed
 	}
-	resLoadSubscribingData.Success = true
 
+	resLoadSubscribingData.ErrCode = 0
 	return c.JSON(http.StatusOK, resLoadSubscribingData)
 }
 
-func getSubscribingData(user ReqLoadPeronsalData) ([]OttService, error) {
+func getSubscribingData(user ReqLoadPeronsalData) ([]OttService, int, error) {
 	subscribed := []OttService{}
 
 	query := fmt.Sprintf("SELECT subscribedServiceId, OTTServiceId, subscribedDate, ExpireDate, paymentType FROM subscribedServices WHERE username = \"%s\"", user.Username)
 	rows, err := util.GetDB().Query(query)
 
 	if err != nil {
-		return nil, err
+		return nil, handleError.ERR_LOAD_SUBSCRIBING_DATA_GET_DB, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var service OttService
 		if err = rows.Scan(&service.SubscribedServiceId, &service.OTTServiceId, &service.SubscribedDate, &service.ExpireDate, &service.PaymentType); err != nil {
-			return nil, err
+			return nil, handleError.ERR_LOAD_SUBSCRIBING_DATA_SELECT_DB, err
 		}
 		subscribed = append(subscribed, service)
 	}
 
-	return subscribed, nil
+	return subscribed, 0, nil
 }

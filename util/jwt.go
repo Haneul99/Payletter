@@ -1,6 +1,8 @@
 package util
 
 import (
+	handleError "Haneul99/Payletter/handlers/error"
+	"errors"
 	"fmt"
 	"time"
 
@@ -19,7 +21,7 @@ type AccessTokenClaims struct {
 var signKey = []byte(ServerConfig.GetStringData("SECRET_KEY"))
 
 // JWT Token 생성
-func CreateJWTAccessToken(username string) (string, error) {
+func CreateJWTAccessToken(username string) (string, int, error) {
 	claims := &AccessTokenClaims{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
@@ -29,37 +31,30 @@ func CreateJWTAccessToken(username string) (string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tk, err := accessToken.SignedString(signKey)
 	if err != nil {
-		return "", err
+		return "", handleError.ERR_JWT_CREATE_ACCESSTOKEN, err
 	}
-	return tk, nil
+	return tk, 0, nil
 }
 
 // 유효한 accessToken인지 검사
-func IsValidAccessToken(accessToken, username string) (bool, error) {
-	isValid, err := decodeJWT(accessToken)
-	if err != nil {
-		return false, err
-	}
-	if !isValid {
-		return false, nil
+func IsValidAccessToken(accessToken, username string) (bool, int, error) {
+	isValid, errCode, err := decodeJWT(accessToken)
+	if !isValid || err != nil {
+		return false, errCode, err
 	}
 
-	isStored, err := isStoredAccessToken(accessToken, username)
-	if err != nil {
-		return false, err
-	}
-	if !isStored {
-		return false, nil
+	isStored, errCode, err := isStoredAccessToken(accessToken, username)
+	if !isStored || err != nil {
+		return false, errCode, err
 	}
 
-	return true, nil
+	return true, 0, nil
 }
 
 // JWT Token 검증
-func decodeJWT(accessToken string) (bool, error) {
+func decodeJWT(accessToken string) (bool, int, error) {
 	if accessToken == "" {
-		fmt.Println("token is null")
-		return false, nil
+		return false, handleError.ERR_JWT_NULL_ACCESSTOKEN, errors.New("ERR_JWT_NULL_ACCESSTOKEN")
 	}
 
 	claims := &AccessTokenClaims{}
@@ -69,24 +64,22 @@ func decodeJWT(accessToken string) (bool, error) {
 
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			fmt.Println("jwt token is invalid")
-			return false, err
+			return false, handleError.ERR_JWT_INVALID_ACCESSTOKEN, err
 		}
 	}
-	fmt.Println("decode succes", claims.Username)
-	return true, nil
+	return true, 0, nil
 }
 
 // 저장되어 있는 accessToken이 일치하는지 검사
-func isStoredAccessToken(accessToken, username string) (bool, error) {
+func isStoredAccessToken(accessToken, username string) (bool, int, error) {
 	query := fmt.Sprintf("SELECT accessToken From USER WHERE username = \"%s\"", username)
 	var storedTK = ""
 	err := GetDB().QueryRow(query).Scan(&storedTK)
 	if err != nil {
-		return false, err
+		return false, handleError.ERR_JWT_GET_DB, err
 	}
 	if storedTK != accessToken {
-		return false, nil
+		return false, handleError.ERR_JWT_INCORRECT_ACCESSTOKEN, nil
 	}
-	return true, nil
+	return true, 0, nil
 }
