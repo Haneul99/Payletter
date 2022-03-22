@@ -3,6 +3,7 @@ package handlers
 import (
 	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -29,11 +30,11 @@ func Login(c echo.Context) error {
 
 	// 비밀번호 오류
 	pwd, errCode, err := getUserPwd(reqLogin)
-	if pwd != reqLogin.Password || err != nil {
+	if err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 	if pwd != reqLogin.Password {
-		return handleError.ReturnResFail(c, http.StatusBadRequest, err, errCode)
+		return handleError.ReturnResFail(c, http.StatusBadRequest, errors.New("ERR_LOGIN_INCORRECT_PASSWORD"), errCode)
 	}
 
 	accessToken, errCode, err := util.CreateJWTAccessToken(reqLogin.Username)

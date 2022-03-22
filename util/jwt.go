@@ -79,7 +79,7 @@ func isStoredAccessToken(accessToken, username string) (bool, int, error) {
 		return false, handleError.ERR_JWT_GET_DB, err
 	}
 	if storedTK != accessToken {
-		return false, handleError.ERR_JWT_INCORRECT_ACCESSTOKEN, nil
+		return false, handleError.ERR_JWT_INCORRECT_ACCESSTOKEN, errors.New("ERR_JWT_INCORRECT_ACCESSTOKEN")
 	}
 	return true, 0, nil
 }
