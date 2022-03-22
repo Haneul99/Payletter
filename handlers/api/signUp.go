@@ -61,7 +61,7 @@ func checkParamId(username string) (bool, int, error) {
 		return false, handleError.ERR_SIGN_UP_GET_DB, err
 	} // 읽기 실패
 	if exist != 0 {
-		return false, handleError.ERR_SIGN_UP_DUPLICATED_ID, nil
+		return false, handleError.ERR_SIGN_UP_DUPLICATED_ID, errors.New("ERR_SIGN_UP_DUPLICATED_ID")
 	} // 이미 존재하는 username
 	return true, 0, nil
 }

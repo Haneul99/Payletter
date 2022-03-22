@@ -12,7 +12,9 @@ type ResFail struct {
 func ReturnResFail(c echo.Context, statusCode int, err error, errCode int) error {
 	resFail := ResFail{}
 	resFail.ErrCode = errCode
-	resFail.Message = err.Error()
+	if err != nil {
+		resFail.Message = err.Error()
+	}
 
 	return c.JSON(statusCode, resFail)
 }
