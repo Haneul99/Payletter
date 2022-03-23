@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -83,7 +84,7 @@ func requestPayletterAPI(method string, uri string, jsonData []byte) ([]byte, in
 		return nil, handleError.ERR_PAYLETTER_NEW_REQUEST, err
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", ServerConfig.GetStringData("Payletter_PAYMENT_API_KEY"))
+	req.Header.Add("Authorization", "PLKEY "+ServerConfig.GetStringData("Payletter_PAYMENT_API_KEY"))
 
 	response, err := client.Do(req)
 	if err != nil {
@@ -115,9 +116,7 @@ func VerifyPayment(payhash, username, tid string, amount int) (bool, int, error)
 	hash.Write([]byte(data))
 	hashData := hex.EncodeToString(hash.Sum(nil))
 
-	fmt.Println(payhash, hashData)
-
-	if payhash != hashData {
+	if !strings.EqualFold(payhash, hashData) {
 		return false, handleError.ERR_PAYLETTER_PAYHASH_INVALID, errors.New("ERR_PAYLETTER_PAYHASH_INVALID")
 	}
 	return true, 0, nil

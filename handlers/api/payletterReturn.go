@@ -2,6 +2,7 @@ package handlers
 
 import (
 	handleError "Haneul99/Payletter/handlers/error"
+	"Haneul99/Payletter/util"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -46,9 +47,9 @@ func PayletterReturn(c echo.Context) error {
 	}
 
 	// CheckParam
-	//if isVerified, errCode, err := util.VerifyPayment(reqPayletterReturn.PayHash, reqPayletterReturn.UserID, reqPayletterReturn.TID, reqPayletterReturn.Amount); !isVerified || err != nil {
-	//	return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
-	//}
+	if isVerified, errCode, err := util.VerifyPayment(reqPayletterReturn.PayHash, reqPayletterReturn.UserID, reqPayletterReturn.TID, reqPayletterReturn.Amount); !isVerified || err != nil {
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
+	}
 
 	// Return
 	return c.JSON(http.StatusOK, reqPayletterReturn)
