@@ -22,23 +22,25 @@ type ResLoadPlatformDetail struct {
 }
 
 func LoadPlatformDetail(c echo.Context) error {
+	resLoadPlatformDetail := ResLoadPlatformDetail{}
+
+	// Bind
 	platformName := c.QueryParam("platform")
 
-	resLoadPlatformDetail := ResLoadPlatformDetail{}
-	results, errCode, err := selectPlatformDetail(platformName)
-
+	// Process
+	results, errCode, err := getPlatformDetail(platformName)
 	if err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 
+	// Return
 	resLoadPlatformDetail.ErrCode = 0
 	resLoadPlatformDetail.Contents = results
-
 	return c.JSON(http.StatusOK, resLoadPlatformDetail)
 }
 
 // Platform 정보 SELECT
-func selectPlatformDetail(platformName string) ([]PlatformDetail, int, error) {
+func getPlatformDetail(platformName string) ([]PlatformDetail, int, error) {
 	query := fmt.Sprintf("SELECT * FROM %s WHERE platform = \"%s\"", "ottservices", platformName)
 	rows, err := util.GetDB().Query(query)
 	if err != nil {

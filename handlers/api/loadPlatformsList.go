@@ -21,19 +21,23 @@ type ResLoadPlatFormsList struct {
 
 func LoadPlatformsList(c echo.Context) error {
 	resLoadPlatFormsList := ResLoadPlatFormsList{}
-	results, errCode, err := selectPlatformList()
+
+	// Process
+	results, errCode, err := getPlatformList()
 	if err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 	for _, value := range results {
 		resLoadPlatFormsList.Contents = append(resLoadPlatFormsList.Contents, value.Platform)
 	}
+
+	// Return
 	resLoadPlatFormsList.ErrCode = 0
 	return c.JSON(http.StatusOK, resLoadPlatFormsList)
 }
 
 // Platform 정보 SELECT
-func selectPlatformList() ([]Product, int, error) {
+func getPlatformList() ([]Product, int, error) {
 	query := fmt.Sprintf("SELECT DISTINCT platform FROM %s", "ottservices")
 	rows, err := util.GetDB().Query(query)
 	if err != nil {

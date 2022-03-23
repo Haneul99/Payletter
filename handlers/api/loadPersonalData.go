@@ -27,20 +27,25 @@ type ResLoadPersonalData struct {
 func LoadPersonalData(c echo.Context) error {
 	resLoadPersonalData := ResLoadPersonalData{}
 	reqLoadPeronsalData := ReqLoadPeronsalData{}
+
+	// Bind
 	if err := c.Bind(&reqLoadPeronsalData); err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_LOAD_PERSONAL_DATA_REQUEST_BINDING)
 	}
 
+	// CheckParam
 	if isValid, errCode, err := util.IsValidAccessToken(reqLoadPeronsalData.AccessToken, reqLoadPeronsalData.Username); !isValid || err != nil {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 
+	// Process
 	if personalData, errCode, err := getPersonalData(reqLoadPeronsalData); err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	} else {
 		resLoadPersonalData.Contents = personalData
 	}
 
+	// Return
 	resLoadPersonalData.ErrCode = 0
 	return c.JSON(http.StatusOK, resLoadPersonalData)
 }

@@ -1,13 +1,13 @@
 package handlers
 
 import (
-	"fmt"
+	handleError "Haneul99/Payletter/handlers/error"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
-type ReqPayletterResult struct {
+type ReqPayletterReturn struct {
 	Code            string `json:"code" form:"code"`
 	Message         string `json:"message" form:"message"`
 	UserID          string `json:"user_id" form:"user_id"`
@@ -22,7 +22,7 @@ type ReqPayletterResult struct {
 	TaxFreeAmount   int    `json:"taxfree_amount" form:"taxfree_amount"`
 	TaxAmount       int    `json:"tax_amount" form:"tax_amount"`
 	PayInfo         string `json:"pay_info" form:"pay_info"`
-	PgCode          string `json:"pgcode" form:"pacode"`
+	PgCode          string `json:"pgcode" form:"pgcode"`
 	BillKey         string `json:"billkey" form:"billkey"`
 	DomesticFlag    string `json:"domestic_flag" form:"domestic_flag"`
 	TransactionDate string `json:"transaction_date" form:"transaction_date"`
@@ -31,17 +31,25 @@ type ReqPayletterResult struct {
 	PayHash         string `json:"payhash" form:"payhash"`
 }
 
-type ResReturnPayResult struct {
+type ResPayletterReturn struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
 
-func PayletterResult(c echo.Context) error {
-	reqPayletterResult := ReqPayletterResult{}
+func PayletterReturn(c echo.Context) error {
+	reqPayletterReturn := ReqPayletterReturn{}
+	//resPayletterReturn := ResPayletterReturn{}
 
-	if err := c.Bind(&reqPayletterResult); err != nil {
-		fmt.Println(err)
+	// Bind
+	if err := c.Bind(&reqPayletterReturn); err != nil {
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_PAYLETTER_RETURN_REQUEST_BINDING)
 	}
 
-	return c.JSON(http.StatusOK, reqPayletterResult)
+	// CheckParam
+	//if isVerified, errCode, err := util.VerifyPayment(reqPayletterReturn.PayHash, reqPayletterReturn.UserID, reqPayletterReturn.TID, reqPayletterReturn.Amount); !isVerified || err != nil {
+	//	return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
+	//}
+
+	// Return
+	return c.JSON(http.StatusOK, reqPayletterReturn)
 }

@@ -24,17 +24,15 @@ type ResLogin struct {
 func Login(c echo.Context) error {
 	resLogin := ResLogin{}
 	reqLogin := ReqLogin{}
+
+	// Bind
 	if err := c.Bind(&reqLogin); err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_LOGIN_REQUEST_BINDING)
 	}
 
-	// 비밀번호 오류
-	pwd, errCode, err := getUserPwd(reqLogin)
-	if err != nil {
-		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
-	}
-	if pwd != reqLogin.Password {
-		return handleError.ReturnResFail(c, http.StatusBadRequest, errors.New("ERR_LOGIN_INCORRECT_PASSWORD"), errCode)
+	// CheckParam
+	if isCorrect, status, errCode, err := loginCheckParamPassword(reqLogin); !isCorrect || err != nil {
+		return handleError.ReturnResFail(c, status, err, errCode)
 	}
 
 	accessToken, errCode, err := util.CreateJWTAccessToken(reqLogin.Username)
@@ -42,26 +40,30 @@ func Login(c echo.Context) error {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 
+	// Process
 	// DB에 AccessToken 삽입
 	if errCode, err := insertUserAccessToken(accessToken, reqLogin.Username); err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 
+	// Return
 	resLogin.AccessToken = accessToken
 	resLogin.ErrCode = 0
 	resLogin.Username = reqLogin.Username
-
 	return c.JSON(http.StatusOK, resLogin)
 }
 
-func getUserPwd(reqLogin ReqLogin) (string, int, error) {
+func loginCheckParamPassword(reqLogin ReqLogin) (bool, int, int, error) {
 	query := fmt.Sprintf("SELECT password FROM USER WHERE username = \"%s\"", reqLogin.Username)
 	var password = ""
 	err := util.GetDB().QueryRow(query).Scan(&password)
 	if err != nil {
-		return "", handleError.ERR_JWT_GET_DB, err
+		return false, http.StatusInternalServerError, handleError.ERR_JWT_GET_DB, err
 	}
-	return password, 0, nil
+	if password != reqLogin.Password {
+		return false, http.StatusBadRequest, handleError.ERR_LOGIN_INCORRECT_PASSWORD, errors.New("ERR_LOGIN_INCORRECT_PASSWORD")
+	}
+	return true, http.StatusOK, 0, nil
 }
 
 func insertUserAccessToken(token, username string) (int, error) {

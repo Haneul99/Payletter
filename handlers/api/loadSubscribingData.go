@@ -32,20 +32,24 @@ func LoadSubscribingData(c echo.Context) error {
 	reqLoadSubscribingData := ReqLoadSubscribingData{}
 	resLoadSubscribingData := ResLoadSubscribingData{}
 
+	// Bind
 	if err := c.Bind(&reqLoadSubscribingData); err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_LOAD_SUBSCRIBING_DATA_REQUEST_BINDING)
 	}
 
+	// CheckParam
 	if isValid, errCode, err := util.IsValidAccessToken(reqLoadSubscribingData.AccessToken, reqLoadSubscribingData.Username); !isValid || err != nil {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 
+	// Process
 	if subscribed, errCode, err := getSubscribingData(ReqLoadPeronsalData(reqLoadSubscribingData)); err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	} else {
 		resLoadSubscribingData.Contents = subscribed
 	}
 
+	// Return
 	resLoadSubscribingData.ErrCode = 0
 	return c.JSON(http.StatusOK, resLoadSubscribingData)
 }

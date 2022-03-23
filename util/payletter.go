@@ -3,14 +3,18 @@ package util
 import (
 	handleError "Haneul99/Payletter/handlers/error"
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 )
 
-type ReqPayletterData struct {
+type ReqPayletterRequestData struct {
 	PgCode          string `json:"pgcode"`
 	ClientID        string `json:"client_id"`
 	ServiceName     string `json:"service_name"`
@@ -28,39 +32,52 @@ type ReqPayletterData struct {
 	OrderNo         string `json:"order_no"`
 }
 
-type ResPayletterData struct {
-	Token     int    `json:"token"`
-	OnlineURL string `json:"online_url"`
-	MobileURL string `json:"mobile_url"`
+type ReqPayletterCancelData struct {
+	PgCode   string `json:"pgcode"`
+	ClientID string `json:"client_id"`
+	UserID   string `json:"user_id"`
+	TID      string `json:"tid"`
+	Amount   int    `json:"amount"`
+	IpAddr   string `json:"ip_addr"`
 }
 
-type ReqRequestPayletterAPI struct {
-	OTTserviceId int    `json:"OTTserviceId"`
-	Platform     string `json:"platform"`
-	Membership   string `json:"membership"`
-	Price        int    `json:"price"`
-	Username     string `json:"username"`
-	AccessToken  string `json:"accessToken"`
-}
+func RequestPayAPI(username string, platform string, membership string, OTTserviceId int, amount int) ([]byte, int, error) {
+	reqPayletterRequestData := ReqPayletterRequestData{}
+	reqPayletterRequestData.PgCode = "creditcard"
+	reqPayletterRequestData.ClientID = "pay_test"
+	reqPayletterRequestData.UserID = username
+	reqPayletterRequestData.Amount = amount
+	reqPayletterRequestData.ProductName = fmt.Sprintf("%d_%s_%s", OTTserviceId, platform, membership)
+	reqPayletterRequestData.ReturnURL = "http://127.0.0.1:8080/api/payletterReturn"
+	reqPayletterRequestData.CallbackURL = "http://127.0.0.1:8080/api/payletterCallback"
+	reqPayletterRequestData.CancelURL = "https://testpg.payletter.com/cancel"
 
-// Payletter 결제요청 api 호출
-func RequestPayletterAPI(method string, uri string, username string, price int, platform string, membership string) ([]byte, int, error) {
-	client := httpClient()
-
-	reqPayletterData := ReqPayletterData{}
-	reqPayletterData.PgCode = "creditcard"
-	reqPayletterData.ClientID = "pay_test"
-	reqPayletterData.UserID = username
-	reqPayletterData.Amount = price
-	reqPayletterData.ProductName = fmt.Sprintf("%s_%s", platform, membership)
-	reqPayletterData.ReturnURL = "http://127.0.0.1:8080/api/payletterResult"
-	reqPayletterData.CallbackURL = "https://testpg.payletter.com/callback"
-	reqPayletterData.CancelURL = "https://testpg.payletter.com/cancel"
-
-	jsonData, err := json.Marshal(reqPayletterData)
+	jsonData, err := json.Marshal(reqPayletterRequestData)
 	if err != nil {
 		return nil, handleError.ERR_PAYLETTER_JSON_MARSHAL, err
 	}
+	return requestPayletterAPI(http.MethodPost, "v1.0/payments/request", jsonData)
+}
+
+func RequestCancelAPI(username string, pgcode string, tid string, amount int) ([]byte, int, error) {
+	reqPayletterCancelData := ReqPayletterCancelData{}
+	reqPayletterCancelData.PgCode = pgcode
+	reqPayletterCancelData.ClientID = "pay_test"
+	reqPayletterCancelData.UserID = username
+	reqPayletterCancelData.TID = tid
+	reqPayletterCancelData.Amount = amount
+	reqPayletterCancelData.IpAddr = "127.0.0.1"
+
+	jsonData, err := json.Marshal(reqPayletterCancelData)
+	if err != nil {
+		return nil, handleError.ERR_PAYLETTER_JSON_MARSHAL, err
+	}
+	return requestPayletterAPI(http.MethodPost, "v1.0/payments/cancel", jsonData)
+}
+
+// Payletter api 호출
+func requestPayletterAPI(method string, uri string, jsonData []byte) ([]byte, int, error) {
+	client := httpClient()
 	req, err := http.NewRequest(method, ServerConfig.GetStringData("Payletter_ENDPOINT")+uri, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, handleError.ERR_PAYLETTER_NEW_REQUEST, err
@@ -86,4 +103,22 @@ func RequestPayletterAPI(method string, uri string, username string, price int, 
 func httpClient() *http.Client {
 	client := &http.Client{Timeout: 10 * time.Second}
 	return client
+}
+
+// Return URL, CallBack URL로 전달된 payhash값과 검증하는 단계
+// user_id + amount + tid + 결제용 API KEY 로 sha256 hash 값 생성
+func VerifyPayment(payhash, username, tid string, amount int) (bool, int, error) {
+	data := username + strconv.Itoa(amount) + tid + ServerConfig.GetStringData("Payletter_PAYMENT_API_KEY")
+	fmt.Println(data)
+
+	hash := sha256.New()
+	hash.Write([]byte(data))
+	hashData := hex.EncodeToString(hash.Sum(nil))
+
+	fmt.Println(payhash, hashData)
+
+	if payhash != hashData {
+		return false, handleError.ERR_PAYLETTER_PAYHASH_INVALID, errors.New("ERR_PAYLETTER_PAYHASH_INVALID")
+	}
+	return true, 0, nil
 }
