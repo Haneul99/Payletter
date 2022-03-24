@@ -51,6 +51,7 @@ func TransactionRecord(c echo.Context) error {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_TRANSACTION_RECORD_JSON_UNMARSHAL)
 	}
 
+	// Return
 	return c.JSON(http.StatusOK, resTransactionRecord)
 }
 
