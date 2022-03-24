@@ -31,6 +31,10 @@ func TransactionRecord(c echo.Context) error {
 	}
 
 	// CheckParam
+	if isValid, errCode, err := util.IsValidAccessToken(reqTransactionRecord.AccessToken, reqTransactionRecord.Username); !isValid || err != nil {
+		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
+	}
+
 	tid, amount, transactionDate, errCode, err := getSubscribedInfo(reqTransactionRecord)
 	if err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
