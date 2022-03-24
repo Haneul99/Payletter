@@ -22,7 +22,7 @@ func ReturnResFail(c echo.Context, statusCode int, err error, errCode int) error
 const (
 	SUCCESS = 0
 
-	//SignUp api 처리 시 발생 에러
+	// SignUp api 처리 시 발생 에러
 	ERR_SIGN_UP_REQUEST_BINDING = 10000 // SignUp 데이터 바인딩 에러
 	ERR_SIGN_UP_DUPLICATED_ID   = 10001 // 중복된 Username
 	ERR_SIGN_UP_NULL_PASSWORD   = 10002 // 빈 Password
@@ -72,35 +72,35 @@ const (
 	// RequestCancel api 처리 시 발생 에러
 	ERR_REQUEST_CANCEL_REQUEST_BINDING     = 10800 // RequestCancel 데이터 바인딩 에러
 	ERR_REQUEST_CANCEL_INVALID_ACCESSTOKEN = 10801 // DB 정보와 일치하지 않는 AccessToken
-	ERR_REQUEST_CANCEL_GET_DB              = 10802
-	ERR_REQUEST_CANCEL_JSON_UNMARSHAL      = 10803
-	ERR_REQUEST_CANCEL_DB_DELETE           = 10804
+	ERR_REQUEST_CANCEL_GET_DB              = 10802 // DB Conn 실패
+	ERR_REQUEST_CANCEL_JSON_UNMARSHAL      = 10803 // JSON Unmarshal Error
+	ERR_REQUEST_CANCEL_DB_DELETE           = 10804 // DB Delete 실패
 
-	// payletterReturn api 처리 시 발생 에러
-	ERR_PAYLETTER_RETURN_REQUEST_BINDING = 10900
+	// PayletterReturn api 처리 시 발생 에러
+	ERR_PAYLETTER_RETURN_REQUEST_BINDING = 10900 // PayletterReturn 데이터 바인딩 에러
 
-	//payletterCallback api 처리 시 발생 에러
-	ERR_PAYLETTER_CALLBACK_REQUEST_BINDING     = 11000
-	ERR_PAYLETTER_CALLBACK_GET_DB              = 11001
-	ERR_PAYLETTER_CALLBACK_CONVERT_STR_TO_INT  = 11002
-	ERR_PAYLETTER_CALLBACK_CONVERT_STR_TO_DATE = 11003
+	// PayletterCallback api 처리 시 발생 에러
+	ERR_PAYLETTER_CALLBACK_REQUEST_BINDING     = 11000 // RequestCallback 데이터 바인딩 에러
+	ERR_PAYLETTER_CALLBACK_GET_DB              = 11001 // DB Conn 실패
+	ERR_PAYLETTER_CALLBACK_CONVERT_STR_TO_INT  = 11002 // String to Int Convert 실패
+	ERR_PAYLETTER_CALLBACK_CONVERT_STR_TO_DATE = 11003 // String to Date Convert 실패
 
-	//transactionRecord api 처리 시 발생 에러
-	ERR_TRANSACTION_RECORD_REQUEST_BINDING = 11101
-	ERR_TRANSACTION_RECORD_GET_DB          = 11102
-	ERR_TRANSACTION_RECORD_JSON_UNMARSHAL  = 11103
+	// TransactionRecord api 처리 시 발생 에러
+	ERR_TRANSACTION_RECORD_REQUEST_BINDING = 11101 // TransactionRecord 데이터 바인딩 에러
+	ERR_TRANSACTION_RECORD_GET_DB          = 11102 // DB Conn 실패
+	ERR_TRANSACTION_RECORD_JSON_UNMARSHAL  = 11103 // JSON Unmarshal Error
 
 	// jwt.go Error
-	ERR_JWT_CREATE_ACCESSTOKEN    = 20000
-	ERR_JWT_NULL_ACCESSTOKEN      = 20001
-	ERR_JWT_INVALID_ACCESSTOKEN   = 20002
-	ERR_JWT_GET_DB                = 20003
-	ERR_JWT_INCORRECT_ACCESSTOKEN = 20004
+	ERR_JWT_CREATE_ACCESSTOKEN    = 20000 // AccessToken 생성 실패
+	ERR_JWT_NULL_ACCESSTOKEN      = 20001 // 빈 AccessToken이 들어옴
+	ERR_JWT_INVALID_ACCESSTOKEN   = 20002 // 유효하지 않은 AccessToken
+	ERR_JWT_GET_DB                = 20003 // DB Conn 실패
+	ERR_JWT_INCORRECT_ACCESSTOKEN = 20004 // DB 정보와 일치하지 않는 AccessToken
 
 	// payletter.go Error
-	ERR_PAYLETTER_JSON_MARSHAL    = 20100
-	ERR_PAYLETTER_NEW_REQUEST     = 20101
-	ERR_PAYLETTER_CLIENT_DO       = 20102
-	ERR_PAYLETTER_IOUTIL_READALL  = 20103
-	ERR_PAYLETTER_PAYHASH_INVALID = 20104
+	ERR_PAYLETTER_JSON_MARSHAL    = 20100 // JSON Unmarshal Error
+	ERR_PAYLETTER_NEW_REQUEST     = 20101 // Request 생성 실패
+	ERR_PAYLETTER_CLIENT_DO       = 20102 // client.Do() 함수 에러
+	ERR_PAYLETTER_IOUTIL_READALL  = 20103 // ioutil.ReadAll() 함수 에러
+	ERR_PAYLETTER_PAYHASH_INVALID = 20104 // Payhash 검증 실패
 )
