@@ -70,7 +70,6 @@ func requestPayCheckParam(username string, OTTserviceId int) (bool, int, int, er
 	if err := util.GetDB().QueryRow(query).Scan(&exist); err != nil {
 		return false, http.StatusInternalServerError, handleError.ERR_REQUEST_PAY_GET_DB, err
 	}
-	fmt.Println(exist)
 	if exist != 0 {
 		return false, http.StatusBadRequest, handleError.ERR_REQUEST_PAY_ALREADY_PAID, errors.New("ERR_REQUEST_PAY_ALREADY_PAID")
 	}

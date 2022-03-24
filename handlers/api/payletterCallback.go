@@ -63,7 +63,10 @@ func PayletterCallback(c echo.Context) error {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_PAYLETTER_CALLBACK_REQUEST_BINDING)
 	}
 
-	//fmt.Println(reqPayletterCallback)
+	// CheckParam
+	if isVerified, errCode, err := util.VerifyPayment(reqPayletterCallback.PayHash, reqPayletterCallback.UserID, reqPayletterCallback.TID, reqPayletterCallback.Amount); !isVerified || err != nil {
+		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
+	}
 
 	// Process
 	if errCode, err := insertPayInfo(reqPayletterCallback); err != nil {
@@ -88,7 +91,7 @@ func insertPayInfo(req ReqPayletterCallback) (int, error) {
 
 	paymentType := getPayInfoBillkey(req.BillKey)
 
-	query := fmt.Sprintf("INSERT INTO subscribedService(username, OTTServiceId, subscribedDate, expireDate, paymentType, tid, price, pgcode) VALUES(\"%s\", %d, \"%s\", \"%s\", %d, \"%s\", %d, \"%s\")", req.UserID, OTTServiceId, subscribedDate, expireDate, paymentType, req.TID, req.Amount, req.PgCode)
+	query := fmt.Sprintf("INSERT INTO subscribedServices(username, OTTServiceId, subscribedDate, expireDate, paymentType, tid, price, pgcode) VALUES(\"%s\", %d, \"%s\", \"%s\", %d, \"%s\", %d, \"%s\")", req.UserID, OTTServiceId, subscribedDate, expireDate, paymentType, req.TID, req.Amount, req.PgCode)
 	_, err = util.GetDB().Exec(query)
 	if err != nil {
 		return handleError.ERR_PAYLETTER_CALLBACK_GET_DB, err

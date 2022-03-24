@@ -57,7 +57,7 @@ func RequestPayAPI(username string, platform string, membership string, OTTservi
 	if err != nil {
 		return nil, handleError.ERR_PAYLETTER_JSON_MARSHAL, err
 	}
-	return requestPayletterAPI(http.MethodPost, "v1.0/payments/request", jsonData)
+	return requestPayletterAPI(http.MethodPost, "v1.0/payments/request", jsonData, "PAYMENT")
 }
 
 func RequestCancelAPI(username string, pgcode string, tid string, amount int) ([]byte, int, error) {
@@ -73,18 +73,24 @@ func RequestCancelAPI(username string, pgcode string, tid string, amount int) ([
 	if err != nil {
 		return nil, handleError.ERR_PAYLETTER_JSON_MARSHAL, err
 	}
-	return requestPayletterAPI(http.MethodPost, "v1.0/payments/cancel", jsonData)
+	return requestPayletterAPI(http.MethodPost, "v1.0/payments/cancel", jsonData, "PAYMENT")
+}
+
+func RequestTransactionRecordAPI(tid string, amount int, transaction_date string) ([]byte, int, error) {
+	transaction_date = transaction_date[:4] + transaction_date[5:7] + transaction_date[8:10]
+	uri := fmt.Sprintf("v1.0/receipt/info/%s/?client_Id=%s&amount=%d&transaction_date=%s", tid, "pay_test", amount, transaction_date)
+	return requestPayletterAPI(http.MethodGet, uri, nil, "SEARCH")
 }
 
 // Payletter api 호출
-func requestPayletterAPI(method string, uri string, jsonData []byte) ([]byte, int, error) {
+func requestPayletterAPI(method string, uri string, jsonData []byte, authType string) ([]byte, int, error) {
 	client := httpClient()
 	req, err := http.NewRequest(method, ServerConfig.GetStringData("Payletter_ENDPOINT")+uri, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, handleError.ERR_PAYLETTER_NEW_REQUEST, err
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "PLKEY "+ServerConfig.GetStringData("Payletter_PAYMENT_API_KEY"))
+	req.Header.Add("Authorization", "PLKEY "+ServerConfig.GetStringData(fmt.Sprintf("Payletter_%s_API_KEY", authType)))
 
 	response, err := client.Do(req)
 	if err != nil {

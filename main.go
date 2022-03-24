@@ -31,6 +31,8 @@ func apiHandlers(e *echo.Echo) {
 	e.POST("/api/loadSubscribingData", handlers.LoadSubscribingData)
 	e.POST("/api/requestPay", handlers.RequestPay)
 	e.POST("/api/requestCancel", handlers.RequestCancel)
+	e.POST("/api/transactionRecord", handlers.TransactionRecord)
 	e.POST("/api/payletterReturn", handlers.PayletterReturn)
 	e.POST("/api/payletterCallback", handlers.PayletterCallback)
+
 }
