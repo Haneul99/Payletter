@@ -96,6 +96,7 @@ const (
 	ERR_JWT_INVALID_ACCESSTOKEN   = 20002 // 유효하지 않은 AccessToken
 	ERR_JWT_GET_DB                = 20003 // DB Conn 실패
 	ERR_JWT_INCORRECT_ACCESSTOKEN = 20004 // DB 정보와 일치하지 않는 AccessToken
+	ERR_JWT_ACCESSTOKEN_EXPIRED   = 20005 // JWT 토큰 만료
 
 	// payletter.go Error
 	ERR_PAYLETTER_JSON_MARSHAL    = 20100 // JSON Unmarshal Error

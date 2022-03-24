@@ -116,7 +116,6 @@ func httpClient() *http.Client {
 // user_id + amount + tid + 결제용 API KEY 로 sha256 hash 값 생성
 func VerifyPayment(payhash, username, tid string, amount int) (bool, int, error) {
 	data := username + strconv.Itoa(amount) + tid + ServerConfig.GetStringData("Payletter_PAYMENT_API_KEY")
-	fmt.Println(data)
 
 	hash := sha256.New()
 	hash.Write([]byte(data))

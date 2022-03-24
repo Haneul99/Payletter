@@ -66,6 +66,7 @@ func decodeJWT(accessToken string) (bool, int, error) {
 		if err == jwt.ErrSignatureInvalid {
 			return false, handleError.ERR_JWT_INVALID_ACCESSTOKEN, err
 		}
+		return false, handleError.ERR_JWT_ACCESSTOKEN_EXPIRED, err
 	}
 	return true, 0, nil
 }

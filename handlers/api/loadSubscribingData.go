@@ -21,6 +21,9 @@ type OttService struct {
 	SubscribedDate      string `json:"subscribedDate"`
 	ExpireDate          string `json:"expireDate"`
 	PaymentType         int    `json:"paymentType"`
+	Platform            string `json:"platform"`
+	Membership          string `json:"membership"`
+	Price               int    `json:"price"`
 }
 
 type ResLoadSubscribingData struct {
@@ -57,7 +60,9 @@ func LoadSubscribingData(c echo.Context) error {
 func getSubscribingData(user ReqLoadPeronsalData) ([]OttService, int, error) {
 	subscribed := []OttService{}
 
-	query := fmt.Sprintf("SELECT subscribedServiceId, OTTServiceId, subscribedDate, ExpireDate, paymentType FROM subscribedServices WHERE username = \"%s\"", user.Username)
+	query := fmt.Sprintf("SELECT subscribedServiceId, OTTServiceId, subscribedDate, ExpireDate, paymentType, platform, membership, subscribedServices.price "+
+		"FROM subscribedServices LEFT JOIN ottservices ON subscribedServices.OTTServiceId = ottservices.OTTServicesId "+
+		"WHERE username = \"%s\"", user.Username)
 	rows, err := util.GetDB().Query(query)
 
 	if err != nil {
@@ -67,7 +72,7 @@ func getSubscribingData(user ReqLoadPeronsalData) ([]OttService, int, error) {
 
 	for rows.Next() {
 		var service OttService
-		if err = rows.Scan(&service.SubscribedServiceId, &service.OTTServiceId, &service.SubscribedDate, &service.ExpireDate, &service.PaymentType); err != nil {
+		if err = rows.Scan(&service.SubscribedServiceId, &service.OTTServiceId, &service.SubscribedDate, &service.ExpireDate, &service.PaymentType, &service.Platform, &service.Membership, &service.Price); err != nil {
 			return nil, handleError.ERR_LOAD_SUBSCRIBING_DATA_SELECT_DB, err
 		}
 		subscribed = append(subscribed, service)

@@ -32,14 +32,8 @@ type ReqPayletterReturn struct {
 	PayHash         string `json:"payhash" form:"payhash"`
 }
 
-type ResPayletterReturn struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
 func PayletterReturn(c echo.Context) error {
 	reqPayletterReturn := ReqPayletterReturn{}
-	//resPayletterReturn := ResPayletterReturn{}
 
 	// Bind
 	if err := c.Bind(&reqPayletterReturn); err != nil {
