@@ -45,7 +45,7 @@ type ReqPayletterCancelData struct {
 func RequestPayAPI(username string, platform string, membership string, OTTserviceId int, amount int) ([]byte, int, error) {
 	reqPayletterRequestData := ReqPayletterRequestData{}
 	reqPayletterRequestData.PgCode = "creditcard"
-	reqPayletterRequestData.ClientID = "pay_test"
+	reqPayletterRequestData.ClientID = ServerConfig.GetStringData("Payletter_CLIENT_ID")
 	reqPayletterRequestData.UserID = username
 	reqPayletterRequestData.Amount = amount
 	reqPayletterRequestData.ProductName = fmt.Sprintf("%d_%s_%s", OTTserviceId, platform, membership)
@@ -63,7 +63,7 @@ func RequestPayAPI(username string, platform string, membership string, OTTservi
 func RequestCancelAPI(username string, pgcode string, tid string, amount int) ([]byte, int, error) {
 	reqPayletterCancelData := ReqPayletterCancelData{}
 	reqPayletterCancelData.PgCode = pgcode
-	reqPayletterCancelData.ClientID = "pay_test"
+	reqPayletterCancelData.ClientID = ServerConfig.GetStringData("Payletter_CLIENT_ID")
 	reqPayletterCancelData.UserID = username
 	reqPayletterCancelData.TID = tid
 	reqPayletterCancelData.Amount = amount
@@ -78,7 +78,7 @@ func RequestCancelAPI(username string, pgcode string, tid string, amount int) ([
 
 func RequestTransactionRecordAPI(tid string, amount int, transaction_date string) ([]byte, int, error) {
 	transaction_date = transaction_date[:4] + transaction_date[5:7] + transaction_date[8:10]
-	uri := fmt.Sprintf("v1.0/receipt/info/%s/?client_Id=%s&amount=%d&transaction_date=%s", tid, "pay_test", amount, transaction_date)
+	uri := fmt.Sprintf("v1.0/receipt/info/%s/?client_Id=%s&amount=%d&transaction_date=%s", tid, ServerConfig.GetStringData("Payletter_CLIENT_ID"), amount, transaction_date)
 	return requestPayletterAPI(http.MethodGet, uri, nil, "SEARCH")
 }
 

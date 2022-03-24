@@ -9,5 +9,6 @@
 
     "Payletter_PAYMENT_API_KEY" : "MTFBNTAzNTEwNDAxQUIyMjlCQzgwNTg1MkU4MkZENDA=",
     "Payletter_SEARCH_API_KEY" : "MUI3MjM0RUExQTgyRDA1ODZGRDUyOEM4OTY2QTVCN0Y=",
-    "Payletter_ENDPOINT" : "https://testpgapi.payletter.com/"
+    "Payletter_ENDPOINT" : "https://testpgapi.payletter.com/",
+    "Payletter_CLIENT_ID" : "pay_test"
 }

@@ -34,5 +34,4 @@ func apiHandlers(e *echo.Echo) {
 	e.POST("/api/transactionRecord", handlers.TransactionRecord)
 	e.POST("/api/payletterReturn", handlers.PayletterReturn)
 	e.POST("/api/payletterCallback", handlers.PayletterCallback)
-
 }
