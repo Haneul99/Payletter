@@ -3,6 +3,7 @@ package handlers
 import (
 	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
+	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
@@ -83,6 +84,9 @@ func insertUserDB(user ReqSignUp) (int, error) {
 	query := fmt.Sprintf("INSERT INTO USER(username, password, email) VALUE(\"%s\", \"%s\", \"%s\")", user.Username, user.Password, user.Email)
 	_, err := util.GetDB().Exec(query)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return handleError.ERR_SIGN_UP_SQL_NO_RESULT, err
+		}
 		return handleError.ERR_SIGN_UP_GET_DB, err
 	}
 	return 0, nil
