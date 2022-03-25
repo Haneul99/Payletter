@@ -41,7 +41,7 @@ func LoadSubscribingData(c echo.Context) error {
 	}
 
 	// CheckParam
-	if isValid, errCode, err := util.IsValidAccessToken(reqLoadSubscribingData.AccessToken, reqLoadSubscribingData.Username); !isValid || err != nil {
+	if errCode, err := util.IsValidAccessToken(reqLoadSubscribingData.AccessToken, reqLoadSubscribingData.Username); err != nil {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 

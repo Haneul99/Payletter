@@ -78,7 +78,8 @@ func RequestCancelAPI(username string, pgcode string, tid string, amount int) ([
 
 func RequestTransactionRecordAPI(tid string, amount int, transaction_date string) ([]byte, int, error) {
 	transaction_date = transaction_date[:4] + transaction_date[5:7] + transaction_date[8:10]
-	uri := fmt.Sprintf("v1.0/receipt/info/%s/?client_Id=%s&amount=%d&transaction_date=%s", tid, ServerConfig.GetStringData("Payletter_CLIENT_ID"), amount, transaction_date)
+	queryParam := fmt.Sprintf("?client_Id=%s&amount=%d&transaction_date=%s", ServerConfig.GetStringData("Payletter_CLIENT_ID"), amount, transaction_date)
+	uri := fmt.Sprintf("v1.0/receipt/info/%s/%s", tid, queryParam)
 	return requestPayletterAPI(http.MethodGet, uri, nil, "SEARCH")
 }
 
@@ -113,7 +114,7 @@ func httpClient() *http.Client {
 
 // Return URL, CallBack URL로 전달된 payhash값과 검증하는 단계
 // user_id + amount + tid + 결제용 API KEY 로 sha256 hash 값 생성
-func VerifyPayment(payhash, username, tid string, amount int) (bool, int, error) {
+func VerifyPayment(payhash, username, tid string, amount int) (int, error) {
 	data := username + strconv.Itoa(amount) + tid + ServerConfig.GetStringData("Payletter_PAYMENT_API_KEY")
 
 	hash := sha256.New()
@@ -121,7 +122,7 @@ func VerifyPayment(payhash, username, tid string, amount int) (bool, int, error)
 	hashData := hex.EncodeToString(hash.Sum(nil))
 
 	if !strings.EqualFold(payhash, hashData) {
-		return false, handleError.ERR_PAYLETTER_PAYHASH_INVALID, errors.New("ERR_PAYLETTER_PAYHASH_INVALID")
+		return handleError.ERR_PAYLETTER_PAYHASH_INVALID, errors.New("ERR_PAYLETTER_PAYHASH_INVALID")
 	}
-	return true, 0, nil
+	return 0, nil
 }

@@ -35,7 +35,7 @@ func LoadPersonalData(c echo.Context) error {
 	}
 
 	// CheckParam
-	if isValid, errCode, err := util.IsValidAccessToken(reqLoadPeronsalData.AccessToken, reqLoadPeronsalData.Username); !isValid || err != nil {
+	if errCode, err := util.IsValidAccessToken(reqLoadPeronsalData.AccessToken, reqLoadPeronsalData.Username); err != nil {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 

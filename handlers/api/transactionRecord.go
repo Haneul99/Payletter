@@ -32,7 +32,7 @@ func TransactionRecord(c echo.Context) error {
 	}
 
 	// CheckParam
-	if isValid, errCode, err := util.IsValidAccessToken(reqTransactionRecord.AccessToken, reqTransactionRecord.Username); !isValid || err != nil {
+	if errCode, err := util.IsValidAccessToken(reqTransactionRecord.AccessToken, reqTransactionRecord.Username); err != nil {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 

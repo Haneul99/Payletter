@@ -30,7 +30,7 @@ func Logout(c echo.Context) error {
 	// CheckParam
 	// 해당 accessToken이 유효한지 검사
 	// 해당 accessToken이 DB에 저장된 것과 동일한지 검사
-	if isValid, errCode, err := util.IsValidAccessToken(reqLogout.AccessToken, reqLogout.Username); !isValid || err != nil {
+	if errCode, err := util.IsValidAccessToken(reqLogout.AccessToken, reqLogout.Username); err != nil {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 

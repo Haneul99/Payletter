@@ -32,7 +32,7 @@ func SignUp(c echo.Context) error {
 	}
 
 	// CheckParam
-	if isAvailable, status, errCode, err := signUpCheckParam(user); !isAvailable || err != nil {
+	if status, errCode, err := signUpCheckParam(user); err != nil {
 		return handleError.ReturnResFail(c, status, err, errCode)
 	}
 
@@ -48,35 +48,38 @@ func SignUp(c echo.Context) error {
 }
 
 // 유저가 입력한 정보가 가입 가능한 정보인지 체크
-func signUpCheckParam(user ReqSignUp) (bool, int, int, error) {
-	if isAvailable, status, errCode, err := checkParamId(user.Username); !isAvailable || err != nil {
-		return false, status, errCode, err
+func signUpCheckParam(user ReqSignUp) (int, int, error) {
+	if status, errCode, err := checkParamId(user.Username); err != nil {
+		return status, errCode, err
 	}
 	// password가 빈 값인지 확인
-	if isNotNull, status, errCode, err := checkParamPassword(user.Password); !isNotNull || err != nil {
-		return false, status, errCode, err
+	if status, errCode, err := checkParamPassword(user.Password); err != nil {
+		return status, errCode, err
 	}
-	return true, http.StatusOK, 0, nil
+	return http.StatusOK, 0, nil
 }
 
 // 아이디 중복 체크
-func checkParamId(username string) (bool, int, int, error) {
+func checkParamId(username string) (int, int, error) {
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE username = \"%s\"", "user", username)
 	exist := 0
 	if err := util.GetDB().QueryRow(query).Scan(&exist); err != nil {
-		return false, http.StatusInternalServerError, handleError.ERR_SIGN_UP_GET_DB, err
+		if err == sql.ErrNoRows {
+			return http.StatusInternalServerError, handleError.ERR_SIGN_UP_SQL_NO_RESULT, err
+		}
+		return http.StatusInternalServerError, handleError.ERR_SIGN_UP_GET_DB, err
 	}
 	if exist != 0 {
-		return false, http.StatusBadRequest, handleError.ERR_SIGN_UP_DUPLICATED_ID, errors.New("ERR_SIGN_UP_DUPLICATED_ID")
+		return http.StatusUnauthorized, handleError.ERR_SIGN_UP_DUPLICATED_ID, errors.New("ERR_SIGN_UP_DUPLICATED_ID")
 	}
-	return true, http.StatusOK, 0, nil
+	return http.StatusOK, 0, nil
 }
 
-func checkParamPassword(password string) (bool, int, int, error) {
+func checkParamPassword(password string) (int, int, error) {
 	if len(password) == 0 {
-		return false, http.StatusBadRequest, handleError.ERR_SIGN_UP_NULL_PASSWORD, errors.New("ERR_SIGNUP_NULL_PASSWORD")
+		return http.StatusBadRequest, handleError.ERR_SIGN_UP_NULL_PASSWORD, errors.New("ERR_SIGNUP_NULL_PASSWORD")
 	}
-	return true, http.StatusOK, 0, nil
+	return http.StatusOK, 0, nil
 }
 
 // DB에 유저 정보 삽입
@@ -84,9 +87,6 @@ func insertUserDB(user ReqSignUp) (int, error) {
 	query := fmt.Sprintf("INSERT INTO USER(username, password, email) VALUE(\"%s\", \"%s\", \"%s\")", user.Username, user.Password, user.Email)
 	_, err := util.GetDB().Exec(query)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return handleError.ERR_SIGN_UP_SQL_NO_RESULT, err
-		}
 		return handleError.ERR_SIGN_UP_GET_DB, err
 	}
 	return 0, nil

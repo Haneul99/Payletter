@@ -37,24 +37,22 @@ func CreateJWTAccessToken(username string) (string, int, error) {
 }
 
 // 유효한 accessToken인지 검사
-func IsValidAccessToken(accessToken, username string) (bool, int, error) {
-	isValid, errCode, err := decodeJWT(accessToken)
-	if !isValid || err != nil {
-		return false, errCode, err
+func IsValidAccessToken(accessToken, username string) (int, error) {
+	if errCode, err := decodeJWT(accessToken); err != nil {
+		return errCode, err
 	}
 
-	isStored, errCode, err := isStoredAccessToken(accessToken, username)
-	if !isStored || err != nil {
-		return false, errCode, err
+	if errCode, err := isStoredAccessToken(accessToken, username); err != nil {
+		return errCode, err
 	}
 
-	return true, 0, nil
+	return 0, nil
 }
 
 // JWT Token 검증
-func decodeJWT(accessToken string) (bool, int, error) {
+func decodeJWT(accessToken string) (int, error) {
 	if accessToken == "" {
-		return false, handleError.ERR_JWT_NULL_ACCESSTOKEN, errors.New("ERR_JWT_NULL_ACCESSTOKEN")
+		return handleError.ERR_JWT_NULL_ACCESSTOKEN, errors.New("ERR_JWT_NULL_ACCESSTOKEN")
 	}
 
 	claims := &AccessTokenClaims{}
@@ -64,23 +62,23 @@ func decodeJWT(accessToken string) (bool, int, error) {
 
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			return false, handleError.ERR_JWT_INVALID_ACCESSTOKEN, err
+			return handleError.ERR_JWT_INVALID_ACCESSTOKEN, err
 		}
-		return false, handleError.ERR_JWT_ACCESSTOKEN_EXPIRED, err
+		return handleError.ERR_JWT_ACCESSTOKEN_EXPIRED, err
 	}
-	return true, 0, nil
+	return 0, nil
 }
 
 // 저장되어 있는 accessToken이 일치하는지 검사
-func isStoredAccessToken(accessToken, username string) (bool, int, error) {
+func isStoredAccessToken(accessToken, username string) (int, error) {
 	query := fmt.Sprintf("SELECT accessToken From USER WHERE username = \"%s\"", username)
 	var storedTK = ""
 	err := GetDB().QueryRow(query).Scan(&storedTK)
 	if err != nil {
-		return false, handleError.ERR_JWT_GET_DB, err
+		return handleError.ERR_JWT_GET_DB, err
 	}
 	if storedTK != accessToken {
-		return false, handleError.ERR_JWT_INCORRECT_ACCESSTOKEN, errors.New("ERR_JWT_INCORRECT_ACCESSTOKEN")
+		return handleError.ERR_JWT_INCORRECT_ACCESSTOKEN, errors.New("ERR_JWT_INCORRECT_ACCESSTOKEN")
 	}
-	return true, 0, nil
+	return 0, nil
 }

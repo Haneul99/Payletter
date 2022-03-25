@@ -34,7 +34,7 @@ func RequestCancel(c echo.Context) error {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_REQUEST_CANCEL_REQUEST_BINDING)
 	}
 
-	if isValid, errCode, err := util.IsValidAccessToken(reqRequestCancel.AccessToken, reqRequestCancel.Username); !isValid || err != nil {
+	if errCode, err := util.IsValidAccessToken(reqRequestCancel.AccessToken, reqRequestCancel.Username); err != nil {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 

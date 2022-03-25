@@ -32,7 +32,7 @@ func Login(c echo.Context) error {
 	}
 
 	// CheckParam
-	if isCorrect, status, errCode, err := loginCheckParamPassword(reqLogin); !isCorrect || err != nil {
+	if status, errCode, err := loginCheckParamPassword(reqLogin); err != nil {
 		return handleError.ReturnResFail(c, status, err, errCode)
 	}
 
@@ -54,20 +54,20 @@ func Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, resLogin)
 }
 
-func loginCheckParamPassword(reqLogin ReqLogin) (bool, int, int, error) {
+func loginCheckParamPassword(reqLogin ReqLogin) (int, int, error) {
 	query := fmt.Sprintf("SELECT password FROM USER WHERE username = \"%s\"", reqLogin.Username)
 	var password = ""
 	err := util.GetDB().QueryRow(query).Scan(&password)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return false, http.StatusBadRequest, handleError.ERR_LOGIN_SQL_NO_RESULT, err
+			return http.StatusBadRequest, handleError.ERR_LOGIN_SQL_NO_RESULT, err
 		}
-		return false, http.StatusInternalServerError, handleError.ERR_JWT_GET_DB, err
+		return http.StatusInternalServerError, handleError.ERR_JWT_GET_DB, err
 	}
 	if password != reqLogin.Password {
-		return false, http.StatusBadRequest, handleError.ERR_LOGIN_INCORRECT_PASSWORD, errors.New("ERR_LOGIN_INCORRECT_PASSWORD")
+		return http.StatusBadRequest, handleError.ERR_LOGIN_INCORRECT_PASSWORD, errors.New("ERR_LOGIN_INCORRECT_PASSWORD")
 	}
-	return true, http.StatusOK, 0, nil
+	return http.StatusOK, 0, nil
 }
 
 func insertUserAccessToken(token, username string) (int, error) {

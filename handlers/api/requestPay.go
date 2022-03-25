@@ -38,11 +38,11 @@ func RequestPay(c echo.Context) error {
 	}
 
 	// CheckParam
-	if isValid, errCode, err := util.IsValidAccessToken(reqRequestPay.AccessToken, reqRequestPay.Username); !isValid || err != nil {
+	if errCode, err := util.IsValidAccessToken(reqRequestPay.AccessToken, reqRequestPay.Username); err != nil {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 
-	if isUnPaid, status, errCode, err := requestPayCheckParam(reqRequestPay.Username, reqRequestPay.OTTserviceId); !isUnPaid || err != nil {
+	if status, errCode, err := requestPayCheckParam(reqRequestPay.Username, reqRequestPay.OTTserviceId); err != nil {
 		return handleError.ReturnResFail(c, status, err, errCode)
 	}
 
@@ -65,17 +65,17 @@ func RequestPay(c echo.Context) error {
 }
 
 // 중복결제 하면 안되니까 구독 정보 중에 해당 유저 + 해당 serviceId가 일치하는게 있는지 확인
-func requestPayCheckParam(username string, OTTserviceId int) (bool, int, int, error) {
+func requestPayCheckParam(username string, OTTserviceId int) (int, int, error) {
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE username = \"%s\" && OTTserviceId = %d", "subscribedServices", username, OTTserviceId)
 	exist := 0
 	if err := util.GetDB().QueryRow(query).Scan(&exist); err != nil {
 		if err == sql.ErrNoRows {
-			return false, http.StatusInternalServerError, handleError.ERR_REQUEST_PAY_SQL_NO_RESULT, err
+			return http.StatusInternalServerError, handleError.ERR_REQUEST_PAY_SQL_NO_RESULT, err
 		}
-		return false, http.StatusInternalServerError, handleError.ERR_REQUEST_PAY_GET_DB, err
+		return http.StatusInternalServerError, handleError.ERR_REQUEST_PAY_GET_DB, err
 	}
 	if exist != 0 {
-		return false, http.StatusBadRequest, handleError.ERR_REQUEST_PAY_ALREADY_PAID, errors.New("ERR_REQUEST_PAY_ALREADY_PAID")
+		return http.StatusBadRequest, handleError.ERR_REQUEST_PAY_ALREADY_PAID, errors.New("ERR_REQUEST_PAY_ALREADY_PAID")
 	}
-	return true, http.StatusOK, 0, nil
+	return http.StatusOK, 0, nil
 }
