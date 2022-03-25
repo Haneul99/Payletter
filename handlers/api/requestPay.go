@@ -3,6 +3,7 @@ package handlers
 import (
 	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -68,6 +69,9 @@ func requestPayCheckParam(username string, OTTserviceId int) (bool, int, int, er
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE username = \"%s\" && OTTserviceId = %d", "subscribedServices", username, OTTserviceId)
 	exist := 0
 	if err := util.GetDB().QueryRow(query).Scan(&exist); err != nil {
+		if err == sql.ErrNoRows {
+			return false, http.StatusInternalServerError, handleError.ERR_REQUEST_PAY_SQL_NO_RESULT, err
+		}
 		return false, http.StatusInternalServerError, handleError.ERR_REQUEST_PAY_GET_DB, err
 	}
 	if exist != 0 {

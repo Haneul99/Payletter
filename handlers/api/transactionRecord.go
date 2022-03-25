@@ -3,6 +3,7 @@ package handlers
 import (
 	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -62,6 +63,9 @@ func getSubscribedInfo(req ReqTransactionRecord) (string, int, string, int, erro
 	transactionDate := ""
 	query := fmt.Sprintf("SELECT tid, price, subscribedDate FROM %s WHERE username = \"%s\" && subscribedServiceId = %d", "subscribedServices", req.Username, req.SubscribedServiceId)
 	if err := util.GetDB().QueryRow(query).Scan(&tid, &amount, &transactionDate); err != nil {
+		if err == sql.ErrNoRows {
+			return "", 0, "", handleError.ERR_TRANSACTION_RECORD_SQL_NO_RESULT, err
+		}
 		return "", 0, "", handleError.ERR_TRANSACTION_RECORD_GET_DB, err
 	}
 

@@ -3,6 +3,7 @@ package handlers
 import (
 	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
+	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
@@ -58,6 +59,9 @@ func loginCheckParamPassword(reqLogin ReqLogin) (bool, int, int, error) {
 	var password = ""
 	err := util.GetDB().QueryRow(query).Scan(&password)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, http.StatusBadRequest, handleError.ERR_LOGIN_SQL_NO_RESULT, err
+		}
 		return false, http.StatusInternalServerError, handleError.ERR_JWT_GET_DB, err
 	}
 	if password != reqLogin.Password {

@@ -44,7 +44,7 @@ type ReqPayletterCancelData struct {
 
 func RequestPayAPI(username string, platform string, membership string, OTTserviceId int, amount int) ([]byte, int, error) {
 	reqPayletterRequestData := ReqPayletterRequestData{}
-	reqPayletterRequestData.PgCode = "creditcard"
+	reqPayletterRequestData.PgCode = "kakaopay"
 	reqPayletterRequestData.ClientID = ServerConfig.GetStringData("Payletter_CLIENT_ID")
 	reqPayletterRequestData.UserID = username
 	reqPayletterRequestData.Amount = amount
@@ -99,7 +99,6 @@ func requestPayletterAPI(method string, uri string, jsonData []byte, authType st
 	defer response.Body.Close()
 
 	body, err := ioutil.ReadAll(response.Body)
-
 	if err != nil {
 		return nil, handleError.ERR_PAYLETTER_IOUTIL_READALL, err
 	}

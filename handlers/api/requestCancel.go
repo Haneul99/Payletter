@@ -3,6 +3,7 @@ package handlers
 import (
 	handleError "Haneul99/Payletter/handlers/error"
 	"Haneul99/Payletter/util"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -71,6 +72,9 @@ func getPayInfo(req ReqRequestCancel) (string, int, string, int, error) {
 	price := 0
 	pgcode := ""
 	if err := util.GetDB().QueryRow(query).Scan(&tid, &price, &pgcode); err != nil {
+		if err == sql.ErrNoRows {
+			return "", 0, "", handleError.ERR_REQUEST_CANCEL_SQL_NO_RESULT, err
+		}
 		return "", 0, "", handleError.ERR_REQUEST_CANCEL_GET_DB, err
 	}
 	return tid, price, pgcode, 0, nil

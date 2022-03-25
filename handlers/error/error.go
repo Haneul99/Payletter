@@ -27,6 +27,7 @@ const (
 	ERR_SIGN_UP_DUPLICATED_ID   = 10001 // 중복된 Username
 	ERR_SIGN_UP_NULL_PASSWORD   = 10002 // 빈 Password
 	ERR_SIGN_UP_GET_DB          = 10003 // DB Conn 실패
+	ERR_SIGN_UP_SQL_NO_RESULT   = 10004 // 결과 없음
 
 	// Login api 처리 시 발생 에러
 	ERR_LOGIN_REQUEST_BINDING    = 10100 // Login 데이터 바인딩 에러
@@ -34,6 +35,7 @@ const (
 	ERR_LOGIN_GET_DB             = 10102 // DB Conn 실패
 	ERR_LOGIN_CREATE_ACCESSTOKEN = 10103 // AccessToken 생성 실패
 	ERR_LOGIN_UPDATE_DB          = 10104 // DB Update 실패
+	ERR_LOGIN_SQL_NO_RESULT      = 10105 // 결과 없음
 
 	// Logout api 처리 시 발생 에러
 	ERR_LOGOUT_REQEUST_BINDING     = 10200 // Logout 데이터 바인딩 에러
@@ -55,6 +57,7 @@ const (
 	ERR_LOAD_PERSONAL_DATA_INVALID_ACCESSTOKEN = 10501 // DB 정보와 일치하지 않는 AccessToken
 	ERR_LOAD_PERSONAL_DATA_GET_DB              = 10502 // DB Conn 실패
 	ERR_LOAD_PERSONAL_DATA_SELECT_DB           = 10503 // DB Select 실패
+	ERR_LOAD_PERSONAL_DATA_SQL_NO_RESULT       = 10504 // 결과 없음
 
 	// LoadSubscribingData api 처리 시 발생 에러
 	ERR_LOAD_SUBSCRIBING_DATA_REQUEST_BINDING     = 10600 //LoadSubscribingData 데이터 바인딩 에러
@@ -68,6 +71,7 @@ const (
 	ERR_REQUEST_PAY_JSON_UNMARSHAL      = 10702 // JSON Unmarshal Error
 	ERR_REQUEST_PAY_ALREADY_PAID        = 10703 // 이미 결제된 서비스
 	ERR_REQUEST_PAY_GET_DB              = 10704 // DB Conn 실패
+	ERR_REQUEST_PAY_SQL_NO_RESULT       = 10705 // 결과 없음
 
 	// RequestCancel api 처리 시 발생 에러
 	ERR_REQUEST_CANCEL_REQUEST_BINDING     = 10800 // RequestCancel 데이터 바인딩 에러
@@ -75,6 +79,7 @@ const (
 	ERR_REQUEST_CANCEL_GET_DB              = 10802 // DB Conn 실패
 	ERR_REQUEST_CANCEL_JSON_UNMARSHAL      = 10803 // JSON Unmarshal Error
 	ERR_REQUEST_CANCEL_DB_DELETE           = 10804 // DB Delete 실패
+	ERR_REQUEST_CANCEL_SQL_NO_RESULT       = 10805 // 결과 없음
 
 	// PayletterReturn api 처리 시 발생 에러
 	ERR_PAYLETTER_RETURN_REQUEST_BINDING = 10900 // PayletterReturn 데이터 바인딩 에러
@@ -89,6 +94,7 @@ const (
 	ERR_TRANSACTION_RECORD_REQUEST_BINDING = 11101 // TransactionRecord 데이터 바인딩 에러
 	ERR_TRANSACTION_RECORD_GET_DB          = 11102 // DB Conn 실패
 	ERR_TRANSACTION_RECORD_JSON_UNMARSHAL  = 11103 // JSON Unmarshal Error
+	ERR_TRANSACTION_RECORD_SQL_NO_RESULT   = 11104 // 결과 없음
 
 	// jwt.go Error
 	ERR_JWT_CREATE_ACCESSTOKEN    = 20000 // AccessToken 생성 실패
