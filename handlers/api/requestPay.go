@@ -75,7 +75,7 @@ func requestPayCheckParam(username string, OTTserviceId int) (int, int, error) {
 		return http.StatusInternalServerError, handleError.ERR_REQUEST_PAY_GET_DB, err
 	}
 	if exist != 0 {
-		return http.StatusBadRequest, handleError.ERR_REQUEST_PAY_ALREADY_PAID, errors.New("ERR_REQUEST_PAY_ALREADY_PAID")
+		return http.StatusForbidden, handleError.ERR_REQUEST_PAY_ALREADY_PAID, errors.New("ERR_REQUEST_PAY_ALREADY_PAID")
 	}
-	return http.StatusOK, 0, nil
+	return http.StatusOK, handleError.SUCCESS, nil
 }

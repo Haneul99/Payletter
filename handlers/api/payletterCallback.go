@@ -41,7 +41,7 @@ type ReqPayletterCallback struct {
 	BillKey         string      `json:"billkey" form:"billkey"`
 	DomesticFlag    string      `json:"domestic_flag" form:"domestic_flag"`
 	TransactionDate string      `json:"transaction_date" form:"transaction_date"`
-	InstallMonth    int         `json:"install_month" form:"install_month"`
+	InstallMonth    string      `json:"install_month" form:"install_month"`
 	CardInfo        string      `json:"card_info" form:"card_info"`
 	PayHash         string      `json:"payhash" form:"payhash"`
 	CashReCeipt     CashReceipt `json:"cash_receipt" form:"cash_receipt"`
@@ -53,6 +53,8 @@ type ResPayletterCallback struct {
 }
 
 func PayletterCallback(c echo.Context) error {
+
+	fmt.Println("callback called")
 	reqPayletterCallback := ReqPayletterCallback{}
 	resPayletterCallback := ResPayletterCallback{}
 
@@ -60,16 +62,21 @@ func PayletterCallback(c echo.Context) error {
 	if err := c.Bind(&reqPayletterCallback); err != nil {
 		resPayletterCallback.Code = http.StatusInternalServerError
 		resPayletterCallback.Message = err.Error()
+		fmt.Println("binding", err)
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_PAYLETTER_CALLBACK_REQUEST_BINDING)
 	}
 
+	fmt.Println("reqPayletterCallback", reqPayletterCallback)
+
 	// CheckParam
 	if errCode, err := util.VerifyPayment(reqPayletterCallback.PayHash, reqPayletterCallback.UserID, reqPayletterCallback.TID, reqPayletterCallback.Amount); err != nil {
+		fmt.Println("verify", err)
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 
 	// Process
 	if errCode, err := insertPayInfo(reqPayletterCallback); err != nil {
+		fmt.Println("insert", err)
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 
@@ -96,7 +103,7 @@ func insertPayInfo(req ReqPayletterCallback) (int, error) {
 	if err != nil {
 		return handleError.ERR_PAYLETTER_CALLBACK_GET_DB, err
 	}
-	return 0, nil
+	return handleError.SUCCESS, nil
 }
 
 func getPayInfoDate(transactionDate string) (string, string, int, error) {
@@ -106,7 +113,7 @@ func getPayInfoDate(transactionDate string) (string, string, int, error) {
 	}
 	expireDate := subscribedDate.AddDate(0, 1, 0).String()[:10] // 한 달 후 구독 만료
 
-	return subscribedDate.String()[:10], expireDate, 0, nil
+	return subscribedDate.String()[:10], expireDate, handleError.SUCCESS, nil
 }
 
 func getPayInfoBillkey(billKey string) int {

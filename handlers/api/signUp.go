@@ -42,7 +42,7 @@ func SignUp(c echo.Context) error {
 	}
 
 	// Return
-	resSignUp.ErrCode = 0
+	resSignUp.ErrCode = handleError.SUCCESS
 	resSignUp.Username = user.Username
 	return c.JSON(http.StatusOK, resSignUp)
 }
@@ -56,7 +56,7 @@ func signUpCheckParam(user ReqSignUp) (int, int, error) {
 	if status, errCode, err := checkParamPassword(user.Password); err != nil {
 		return status, errCode, err
 	}
-	return http.StatusOK, 0, nil
+	return http.StatusOK, handleError.SUCCESS, nil
 }
 
 // 아이디 중복 체크
@@ -72,22 +72,21 @@ func checkParamId(username string) (int, int, error) {
 	if exist != 0 {
 		return http.StatusUnauthorized, handleError.ERR_SIGN_UP_DUPLICATED_ID, errors.New("ERR_SIGN_UP_DUPLICATED_ID")
 	}
-	return http.StatusOK, 0, nil
+	return http.StatusOK, handleError.SUCCESS, nil
 }
 
 func checkParamPassword(password string) (int, int, error) {
 	if len(password) == 0 {
 		return http.StatusBadRequest, handleError.ERR_SIGN_UP_NULL_PASSWORD, errors.New("ERR_SIGNUP_NULL_PASSWORD")
 	}
-	return http.StatusOK, 0, nil
+	return http.StatusOK, handleError.SUCCESS, nil
 }
 
 // DB에 유저 정보 삽입
 func insertUserDB(user ReqSignUp) (int, error) {
 	query := fmt.Sprintf("INSERT INTO USER(username, password, email) VALUE(\"%s\", \"%s\", \"%s\")", user.Username, user.Password, user.Email)
-	_, err := util.GetDB().Exec(query)
-	if err != nil {
+	if _, err := util.GetDB().Exec(query); err != nil {
 		return handleError.ERR_SIGN_UP_GET_DB, err
 	}
-	return 0, nil
+	return handleError.SUCCESS, nil
 }

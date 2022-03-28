@@ -40,7 +40,7 @@ func Logout(c echo.Context) error {
 	}
 
 	// Return
-	resLogout.ErrCode = 0
+	resLogout.ErrCode = handleError.SUCCESS
 	return c.JSON(http.StatusOK, resLogout)
 }
 
@@ -51,5 +51,5 @@ func deleteUserAccessToken(username string) (int, error) {
 	if err != nil {
 		return handleError.ERR_JWT_GET_DB, err
 	}
-	return 0, nil
+	return handleError.SUCCESS, nil
 }

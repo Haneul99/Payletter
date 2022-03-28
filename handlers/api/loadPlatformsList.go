@@ -32,7 +32,7 @@ func LoadPlatformsList(c echo.Context) error {
 	}
 
 	// Return
-	resLoadPlatFormsList.ErrCode = 0
+	resLoadPlatFormsList.ErrCode = handleError.SUCCESS
 	return c.JSON(http.StatusOK, resLoadPlatFormsList)
 }
 
@@ -54,5 +54,5 @@ func getPlatformList() ([]Product, int, error) {
 		}
 		results = append(results, platform)
 	}
-	return results, 0, nil
+	return results, handleError.SUCCESS, nil
 }

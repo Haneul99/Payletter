@@ -77,7 +77,7 @@ func getPayInfo(req ReqRequestCancel) (string, int, string, int, error) {
 		}
 		return "", 0, "", handleError.ERR_REQUEST_CANCEL_GET_DB, err
 	}
-	return tid, price, pgcode, 0, nil
+	return tid, price, pgcode, handleError.SUCCESS, nil
 }
 
 // 결제 취소 후 DB에서 삭제
@@ -87,5 +87,5 @@ func deletePayInfo(req ReqRequestCancel) (int, error) {
 	if err != nil {
 		return handleError.ERR_REQUEST_CANCEL_DB_DELETE, err
 	}
-	return 0, nil
+	return handleError.SUCCESS, nil
 }

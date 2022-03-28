@@ -53,7 +53,7 @@ func LoadSubscribingData(c echo.Context) error {
 	}
 
 	// Return
-	resLoadSubscribingData.ErrCode = 0
+	resLoadSubscribingData.ErrCode = handleError.SUCCESS
 	return c.JSON(http.StatusOK, resLoadSubscribingData)
 }
 
@@ -78,5 +78,5 @@ func getSubscribingData(user ReqLoadPeronsalData) ([]OttService, int, error) {
 		subscribed = append(subscribed, service)
 	}
 
-	return subscribed, 0, nil
+	return subscribed, handleError.SUCCESS, nil
 }

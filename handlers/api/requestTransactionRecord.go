@@ -23,7 +23,7 @@ type ResTransactionRecord struct {
 	ReceiptURL string `json:"receipt_url"`
 }
 
-func TransactionRecord(c echo.Context) error {
+func RequestTransactionRecord(c echo.Context) error {
 	reqTransactionRecord := ReqTransactionRecord{}
 
 	// Bind
@@ -69,5 +69,5 @@ func getSubscribedInfo(req ReqTransactionRecord) (string, int, string, int, erro
 		return "", 0, "", handleError.ERR_TRANSACTION_RECORD_GET_DB, err
 	}
 
-	return tid, amount, transactionDate, 0, nil
+	return tid, amount, transactionDate, handleError.SUCCESS, nil
 } // tid, amount, transactionDate return

@@ -66,6 +66,15 @@ CREATE TABLE IF NOT EXISTS `OTTsdb`.`subscribedServices` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS `OTTsdb`.`messages` (
+	`messageId` INT(64) NOT NULL AUTO_INCREMENT,
+    `sender` VARCHAR(45) NOT NULL,
+    `receiver` VARCHAR(45) NOT NULL,
+    `message` VARCHAR(200) NOT NULL,
+    `date` datetime NOT NULL,
+    PRIMARY KEY(`messageId`))
+ENGINE = InnoDB;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

@@ -34,7 +34,7 @@ func LoadPlatformDetail(c echo.Context) error {
 	}
 
 	// Return
-	resLoadPlatformDetail.ErrCode = 0
+	resLoadPlatformDetail.ErrCode = handleError.SUCCESS
 	resLoadPlatformDetail.Contents = results
 	return c.JSON(http.StatusOK, resLoadPlatformDetail)
 }
@@ -57,5 +57,5 @@ func getPlatformDetail(platformName string) ([]PlatformDetail, int, error) {
 		}
 		results = append(results, platformDetail)
 	}
-	return results, 0, nil
+	return results, handleError.SUCCESS, nil
 }

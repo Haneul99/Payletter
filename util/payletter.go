@@ -44,14 +44,16 @@ type ReqPayletterCancelData struct {
 
 func RequestPayAPI(username string, platform string, membership string, OTTserviceId int, amount int) ([]byte, int, error) {
 	reqPayletterRequestData := ReqPayletterRequestData{}
-	reqPayletterRequestData.PgCode = "kakaopay"
+	reqPayletterRequestData.PgCode = "creditcard"
 	reqPayletterRequestData.ClientID = ServerConfig.GetStringData("Payletter_CLIENT_ID")
 	reqPayletterRequestData.UserID = username
 	reqPayletterRequestData.Amount = amount
 	reqPayletterRequestData.ProductName = fmt.Sprintf("%d_%s_%s", OTTserviceId, platform, membership)
-	reqPayletterRequestData.ReturnURL = "http://127.0.0.1:8080/api/payletterReturn"
-	reqPayletterRequestData.CallbackURL = "http://127.0.0.1:8080/api/payletterCallback"
+	reqPayletterRequestData.ReturnURL = "http://58.234.2.81:80/api/payletterReturn"
+	reqPayletterRequestData.CallbackURL = "http://58.234.2.81:80/api/payletterCallback"
 	reqPayletterRequestData.CancelURL = "https://testpg.payletter.com/cancel"
+
+	fmt.Println("RequestPay called")
 
 	jsonData, err := json.Marshal(reqPayletterRequestData)
 	if err != nil {

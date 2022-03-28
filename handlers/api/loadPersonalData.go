@@ -47,7 +47,7 @@ func LoadPersonalData(c echo.Context) error {
 	}
 
 	// Return
-	resLoadPersonalData.ErrCode = 0
+	resLoadPersonalData.ErrCode = handleError.SUCCESS
 	return c.JSON(http.StatusOK, resLoadPersonalData)
 }
 
@@ -60,5 +60,5 @@ func getPersonalData(user ReqLoadPeronsalData) (User, int, error) {
 		}
 		return personalData, handleError.ERR_JWT_GET_DB, err
 	}
-	return personalData, 0, nil
+	return personalData, handleError.SUCCESS, nil
 }

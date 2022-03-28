@@ -96,6 +96,10 @@ const (
 	ERR_TRANSACTION_RECORD_JSON_UNMARSHAL  = 11103 // JSON Unmarshal Error
 	ERR_TRANSACTION_RECORD_SQL_NO_RESULT   = 11104 // 결과 없음
 
+	// SendMessage api 처리 시 발생 에러
+	ERR_SEND_MESSAGE_REQUEST_BINDING = 11200 // SendMessage 데이터 바인딩 에러
+	ERR_SEND_MESSAGE_GET_DB          = 11201 // DB Conn 실패
+
 	// jwt.go Error
 	ERR_JWT_CREATE_ACCESSTOKEN    = 20000 // AccessToken 생성 실패
 	ERR_JWT_NULL_ACCESSTOKEN      = 20001 // 빈 AccessToken이 들어옴

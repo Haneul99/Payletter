@@ -49,7 +49,7 @@ func Login(c echo.Context) error {
 
 	// Return
 	resLogin.AccessToken = accessToken
-	resLogin.ErrCode = 0
+	resLogin.ErrCode = handleError.SUCCESS
 	resLogin.Username = reqLogin.Username
 	return c.JSON(http.StatusOK, resLogin)
 }
@@ -67,7 +67,7 @@ func loginCheckParamPassword(reqLogin ReqLogin) (int, int, error) {
 	if password != reqLogin.Password {
 		return http.StatusBadRequest, handleError.ERR_LOGIN_INCORRECT_PASSWORD, errors.New("ERR_LOGIN_INCORRECT_PASSWORD")
 	}
-	return http.StatusOK, 0, nil
+	return http.StatusOK, handleError.SUCCESS, nil
 }
 
 func insertUserAccessToken(token, username string) (int, error) {
@@ -76,5 +76,5 @@ func insertUserAccessToken(token, username string) (int, error) {
 	if err != nil {
 		return handleError.ERR_JWT_GET_DB, err
 	}
-	return 0, nil
+	return handleError.SUCCESS, nil
 }
