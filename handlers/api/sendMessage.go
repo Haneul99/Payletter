@@ -32,7 +32,7 @@ func SendMessage(c echo.Context) error {
 	if errCode, err := util.IsValidAccessToken(reqSendMessage.AccessToken, reqSendMessage.Sender); err != nil {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
-
+	time.Sleep(10 * time.Second) // sleep을 지우지 않고 10초 작동 하는데, 유저한테 결과를 바로 알려주도록 하기
 	if errCode, err := insertMessageDB(reqSendMessage); err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
