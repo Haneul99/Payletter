@@ -33,7 +33,7 @@ func CreateJWTAccessToken(username string) (string, int, error) {
 	if err != nil {
 		return "", handleError.ERR_JWT_CREATE_ACCESSTOKEN, err
 	}
-	return tk, 0, nil
+	return tk, handleError.SUCCESS, nil
 }
 
 // 유효한 accessToken인지 검사
@@ -46,7 +46,7 @@ func IsValidAccessToken(accessToken, username string) (int, error) {
 		return errCode, err
 	}
 
-	return 0, nil
+	return handleError.SUCCESS, nil
 }
 
 // JWT Token 검증
@@ -66,7 +66,7 @@ func decodeJWT(accessToken string) (int, error) {
 		}
 		return handleError.ERR_JWT_ACCESSTOKEN_EXPIRED, err
 	}
-	return 0, nil
+	return handleError.SUCCESS, nil
 }
 
 // 저장되어 있는 accessToken이 일치하는지 검사
@@ -80,5 +80,5 @@ func isStoredAccessToken(accessToken, username string) (int, error) {
 	if storedTK != accessToken {
 		return handleError.ERR_JWT_INCORRECT_ACCESSTOKEN, errors.New("ERR_JWT_INCORRECT_ACCESSTOKEN")
 	}
-	return 0, nil
+	return handleError.SUCCESS, nil
 }

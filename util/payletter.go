@@ -55,8 +55,6 @@ func RequestPayAPI(username string, platform string, membership string, OTTservi
 	reqPayletterRequestData.CallbackURL = "http://127.0.0.1:8080/api/payletterCallback"
 	reqPayletterRequestData.CancelURL = "https://testpg.payletter.com/cancel"
 
-	fmt.Println("RequestPay called")
-
 	jsonData, err := json.Marshal(reqPayletterRequestData)
 	if err != nil {
 		return nil, handleError.ERR_PAYLETTER_JSON_MARSHAL, err
@@ -108,7 +106,7 @@ func requestPayletterAPI(method string, uri string, jsonData []byte, authType st
 		return nil, handleError.ERR_PAYLETTER_IOUTIL_READALL, err
 	}
 
-	return body, 0, nil
+	return body, handleError.SUCCESS, nil
 }
 
 func httpClient() *http.Client {
@@ -128,5 +126,5 @@ func VerifyPayment(payhash, username, tid string, amount int) (int, error) {
 	if !strings.EqualFold(payhash, hashData) {
 		return handleError.ERR_PAYLETTER_PAYHASH_INVALID, errors.New("ERR_PAYLETTER_PAYHASH_INVALID")
 	}
-	return 0, nil
+	return handleError.SUCCESS, nil
 }

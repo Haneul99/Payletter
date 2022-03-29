@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+
 	if util.ServerConfig.LoadConfig() != nil {
 		panic("설정파일 읽기 실패")
 	}
