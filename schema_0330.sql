@@ -71,7 +71,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `OTTsdb`.`message`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `OTTsdb`.`message` (
+CREATE TABLE IF NOT EXISTS `OTTsdb`.`messages` (
   `messageId` INT(64) NOT NULL AUTO_INCREMENT,
   `sender` VARCHAR(45) NOT NULL,
   `receiver` VARCHAR(45) NOT NULL,
