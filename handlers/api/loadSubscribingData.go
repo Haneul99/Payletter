@@ -62,7 +62,7 @@ func getSubscribingData(user ReqLoadPeronsalData) ([]OttService, int, error) {
 
 	query := fmt.Sprintf("SELECT subscribedServiceId, OTTServiceId, subscribedDate, ExpireDate, paymentType, platform, membership, subscribedServices.price "+
 		"FROM subscribedServices LEFT JOIN ottservices ON subscribedServices.OTTServiceId = ottservices.OTTServicesId "+
-		"WHERE username = \"%s\"", user.Username)
+		"WHERE username = \"%s\" && canceled = 0", user.Username)
 	rows, err := util.GetDB().Query(query)
 
 	if err != nil {

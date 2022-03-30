@@ -100,6 +100,11 @@ const (
 	ERR_SEND_MESSAGE_REQUEST_BINDING = 11200 // SendMessage 데이터 바인딩 에러
 	ERR_SEND_MESSAGE_GET_DB          = 11201 // DB Conn 실패
 
+	// LoadPaymentRecordsList api 처리 시 발생 에러
+	ERR_LOAD_PAYMENT_RECORDS_LIST_REQUEST_BINDING = 11300 // LoadPaymentRecordsList 데이터 바인딩 에러
+	ERR_LOAD_PAYMENT_RECORDS_LIST_GET_DB          = 11301 // DB Conn 실패
+	ERR_LOAD_PAYMENT_RECORDS_LIST_SELECT_DB       = 11302 // DB SELECT 실패
+
 	// jwt.go Error
 	ERR_JWT_CREATE_ACCESSTOKEN    = 20000 // AccessToken 생성 실패
 	ERR_JWT_NULL_ACCESSTOKEN      = 20001 // 빈 AccessToken이 들어옴

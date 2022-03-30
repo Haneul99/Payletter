@@ -66,7 +66,7 @@ func RequestPay(c echo.Context) error {
 
 // 중복결제 하면 안되니까 구독 정보 중에 해당 유저 + 해당 serviceId가 일치하는게 있는지 확인
 func requestPayCheckParam(username string, OTTserviceId int) (int, int, error) {
-	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE username = \"%s\" && OTTserviceId = %d", "subscribedServices", username, OTTserviceId)
+	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE username = \"%s\" && OTTserviceId = %d && canceled = 0", "subscribedServices", username, OTTserviceId)
 	exist := 0
 	if err := util.GetDB().QueryRow(query).Scan(&exist); err != nil {
 		if err == sql.ErrNoRows {

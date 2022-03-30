@@ -82,7 +82,7 @@ func getPayInfo(req ReqRequestCancel) (string, int, string, int, error) {
 
 // 결제 취소 후 DB에서 삭제
 func deletePayInfo(req ReqRequestCancel) (int, error) {
-	query := fmt.Sprintf("DELETE FROM subscribedServices WHERE subscribedServiceId = %d", req.SubscribedServiceId)
+	query := fmt.Sprintf("UPDATE subscribedServices SET canceled = 1 WHERE subscribedServiceId = %d", req.SubscribedServiceId)
 	_, err := util.GetDB().Exec(query)
 	if err != nil {
 		return handleError.ERR_REQUEST_CANCEL_DB_DELETE, err

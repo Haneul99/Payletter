@@ -42,4 +42,5 @@ func apiHandlers(e *echo.Echo) {
 	e.POST("/api/payletterReturn", handlers.PayletterReturn)
 	e.POST("/api/payletterCallback", handlers.PayletterCallback)
 	e.POST("/api/sendMessage", handlers.SendMessage)
+	e.POST("/api/loadPaymentRecordsList", handlers.LoadPaymentRecordslist)
 }
