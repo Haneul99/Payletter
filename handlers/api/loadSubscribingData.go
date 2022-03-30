@@ -71,11 +71,11 @@ func getSubscribingData(user ReqLoadPeronsalData) ([]OttService, int, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var service OttService
-		if err = rows.Scan(&service.SubscribedServiceId, &service.OTTServiceId, &service.SubscribedDate, &service.ExpireDate, &service.PaymentType, &service.Platform, &service.Membership, &service.Price); err != nil {
+		var ott OttService
+		if err = rows.Scan(&ott.SubscribedServiceId, &ott.OTTServiceId, &ott.SubscribedDate, &ott.ExpireDate, &ott.PaymentType, &ott.Platform, &ott.Membership, &ott.Price); err != nil {
 			return nil, handleError.ERR_LOAD_SUBSCRIBING_DATA_SELECT_DB, err
 		}
-		subscribed = append(subscribed, service)
+		subscribed = append(subscribed, ott)
 	}
 
 	return subscribed, handleError.SUCCESS, nil

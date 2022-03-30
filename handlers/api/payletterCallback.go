@@ -53,8 +53,6 @@ type ResPayletterCallback struct {
 }
 
 func PayletterCallback(c echo.Context) error {
-
-	fmt.Println("callback called")
 	reqPayletterCallback := ReqPayletterCallback{}
 	resPayletterCallback := ResPayletterCallback{}
 
@@ -62,21 +60,16 @@ func PayletterCallback(c echo.Context) error {
 	if err := c.Bind(&reqPayletterCallback); err != nil {
 		resPayletterCallback.Code = http.StatusInternalServerError
 		resPayletterCallback.Message = err.Error()
-		fmt.Println("binding", err)
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_PAYLETTER_CALLBACK_REQUEST_BINDING)
 	}
 
-	fmt.Println("reqPayletterCallback", reqPayletterCallback)
-
 	// CheckParam
 	if errCode, err := util.VerifyPayment(reqPayletterCallback.PayHash, reqPayletterCallback.UserID, reqPayletterCallback.TID, reqPayletterCallback.Amount); err != nil {
-		fmt.Println("verify", err)
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 
 	// Process
 	if errCode, err := insertPayInfo(reqPayletterCallback); err != nil {
-		fmt.Println("insert", err)
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 

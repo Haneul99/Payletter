@@ -38,34 +38,34 @@ func LoadPaymentRecordslist(c echo.Context) error {
 	reqLoadPaymentRecordsList := ReqLoadPaymentRecordsList{}
 	resLoadPaymentRecordsList := ResLoadPaymentRecordsList{}
 
+	// Bind
 	if err := c.Bind(&reqLoadPaymentRecordsList); err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, handleError.ERR_LOAD_PAYMENT_RECORDS_LIST_REQUEST_BINDING)
 	}
 
+	// CheckParam
 	if errCode, err := util.IsValidAccessToken(reqLoadPaymentRecordsList.AccessToken, reqLoadPaymentRecordsList.Username); err != nil {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 
-	fmt.Println("AccessToken 검증 성공")
-
-	paid, errCode, err := getPaymentRecordsList(reqLoadPaymentRecordsList)
+	// Process
+	record, errCode, err := getPaymentRecordsList(reqLoadPaymentRecordsList)
 	if err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 
-	resLoadPaymentRecordsList.Contents = paid
+	// Return
+	resLoadPaymentRecordsList.Contents = record
 	return c.JSON(handleError.SUCCESS, resLoadPaymentRecordsList)
 }
 
 func getPaymentRecordsList(req ReqLoadPaymentRecordsList) ([]PaymentRecord, int, error) {
-	fmt.Println("get Payment Records List")
-	paid := []PaymentRecord{}
+	record := []PaymentRecord{}
 
 	query := fmt.Sprintf("SELECT subscribedServiceId, OTTServiceId, platform, membership, subscribedDate, ExpireDate, paymentType, tid, subscribedServices.price, pgcode, canceled "+
 		"FROM subscribedServices LEFT JOIN ottservices ON subscribedServices.OTTServiceId = ottservices.OTTServicesId "+
 		"WHERE username = \"%s\"", req.Username)
 
-	fmt.Println(query)
 	rows, err := util.GetDB().Query(query)
 
 	if err != nil {
@@ -74,12 +74,12 @@ func getPaymentRecordsList(req ReqLoadPaymentRecordsList) ([]PaymentRecord, int,
 	defer rows.Close()
 
 	for rows.Next() {
-		var service PaymentRecord
-		if err = rows.Scan(&service.SubscribedServiceId, &service.OTTServiceId, &service.Platform, &service.Membership, &service.SubscribedDate, &service.ExpireDate, &service.PaymentType, &service.TID, &service.Price, &service.PgCode, &service.Canceled); err != nil {
+		var p PaymentRecord
+		if err = rows.Scan(&p.SubscribedServiceId, &p.OTTServiceId, &p.Platform, &p.Membership, &p.SubscribedDate, &p.ExpireDate, &p.PaymentType, &p.TID, &p.Price, &p.PgCode, &p.Canceled); err != nil {
 			return nil, handleError.ERR_LOAD_PAYMENT_RECORDS_LIST_SELECT_DB, err
 		}
-		paid = append(paid, service)
+		record = append(record, p)
 	}
 
-	return paid, handleError.SUCCESS, nil
+	return record, handleError.SUCCESS, nil
 }
