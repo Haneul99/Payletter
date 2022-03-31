@@ -30,7 +30,6 @@ type PaymentRecord struct {
 
 type ResLoadPaymentRecordsList struct {
 	ErrCode  int             `json:"errCode"`
-	Username string          `json:"username"`
 	Contents []PaymentRecord `json:"contents"`
 }
 
