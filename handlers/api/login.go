@@ -42,7 +42,6 @@ func Login(c echo.Context) error {
 	}
 
 	// Process
-	// DB에 AccessToken 삽입
 	if errCode, err := insertUserAccessToken(accessToken, reqLogin.Username); err != nil {
 		return handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
@@ -60,12 +59,12 @@ func loginCheckParamPassword(reqLogin ReqLogin) (int, int, error) {
 	err := util.GetDB().QueryRow(query).Scan(&password)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return http.StatusBadRequest, handleError.ERR_LOGIN_SQL_NO_RESULT, err
+			return http.StatusUnauthorized, handleError.ERR_LOGIN_SQL_NO_RESULT, err
 		}
 		return http.StatusInternalServerError, handleError.ERR_JWT_GET_DB, err
 	}
 	if password != reqLogin.Password {
-		return http.StatusBadRequest, handleError.ERR_LOGIN_INCORRECT_PASSWORD, errors.New("ERR_LOGIN_INCORRECT_PASSWORD")
+		return http.StatusUnauthorized, handleError.ERR_LOGIN_INCORRECT_PASSWORD, errors.New("ERR_LOGIN_INCORRECT_PASSWORD")
 	}
 	return http.StatusOK, handleError.SUCCESS, nil
 }

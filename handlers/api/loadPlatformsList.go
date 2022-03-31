@@ -36,7 +36,6 @@ func LoadPlatformsList(c echo.Context) error {
 	return c.JSON(http.StatusOK, resLoadPlatFormsList)
 }
 
-// Platform 정보 SELECT
 func getPlatformList() ([]Product, int, error) {
 	query := fmt.Sprintf("SELECT DISTINCT platform FROM %s", "ottservices")
 	rows, err := util.GetDB().Query(query)

@@ -39,7 +39,6 @@ func LoadPlatformDetail(c echo.Context) error {
 	return c.JSON(http.StatusOK, resLoadPlatformDetail)
 }
 
-// Platform 정보 SELECT
 func getPlatformDetail(platformName string) ([]PlatformDetail, int, error) {
 	query := fmt.Sprintf("SELECT * FROM %s WHERE platform = \"%s\"", "ottservices", platformName)
 	rows, err := util.GetDB().Query(query)

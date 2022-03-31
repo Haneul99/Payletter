@@ -47,7 +47,6 @@ func SignUp(c echo.Context) error {
 	return c.JSON(http.StatusOK, resSignUp)
 }
 
-// 유저가 입력한 정보가 가입 가능한 정보인지 체크
 func signUpCheckParam(user ReqSignUp) (int, int, error) {
 	if status, errCode, err := checkParamId(user.Username); err != nil {
 		return status, errCode, err
@@ -59,7 +58,6 @@ func signUpCheckParam(user ReqSignUp) (int, int, error) {
 	return http.StatusOK, handleError.SUCCESS, nil
 }
 
-// 아이디 중복 체크
 func checkParamId(username string) (int, int, error) {
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE username = \"%s\"", "user", username)
 	exist := 0
@@ -82,7 +80,6 @@ func checkParamPassword(password string) (int, int, error) {
 	return http.StatusOK, handleError.SUCCESS, nil
 }
 
-// DB에 유저 정보 삽입
 func insertUserDB(user ReqSignUp) (int, error) {
 	query := fmt.Sprintf("INSERT INTO USER(username, password, email) VALUE(\"%s\", \"%s\", \"%s\")", user.Username, user.Password, user.Email)
 	if _, err := util.GetDB().Exec(query); err != nil {

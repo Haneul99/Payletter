@@ -38,13 +38,11 @@ func RequestCancel(c echo.Context) error {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
 
-	// DB에서 정보 불러오고
 	tid, price, pgcode, errCode, err := getPayInfo(reqRequestCancel)
 	if err != nil {
 		handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
 	}
 
-	//Payletter cancel API 호출
 	respBody, errCode, err := util.RequestCancelAPI(reqRequestCancel.Username, pgcode, tid, price)
 	if err != nil {
 		handleError.ReturnResFail(c, http.StatusInternalServerError, err, errCode)
@@ -65,7 +63,6 @@ func RequestCancel(c echo.Context) error {
 	return c.JSON(http.StatusOK, resPayletterRequestCancel)
 }
 
-// 결제 취소를 원하는 구독의 정보 DB에서 불러오기
 func getPayInfo(req ReqRequestCancel) (string, int, string, int, error) {
 	query := fmt.Sprintf("SELECT tid, price, pgcode FROM subscribedServices WHERE SubscribedServiceId = %d", req.SubscribedServiceId)
 	tid := ""
@@ -80,7 +77,6 @@ func getPayInfo(req ReqRequestCancel) (string, int, string, int, error) {
 	return tid, price, pgcode, handleError.SUCCESS, nil
 }
 
-// 결제 취소 후 DB에서 삭제
 func deletePayInfo(req ReqRequestCancel) (int, error) {
 	query := fmt.Sprintf("UPDATE subscribedServices SET canceled = 1 WHERE subscribedServiceId = %d", req.SubscribedServiceId)
 	_, err := util.GetDB().Exec(query)

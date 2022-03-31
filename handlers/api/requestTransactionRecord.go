@@ -56,7 +56,6 @@ func RequestTransactionRecord(c echo.Context) error {
 	return c.JSON(http.StatusOK, resTransactionRecord)
 }
 
-// DB에서 tid로 거래 정보 불러오기 or OTTServiceId로 거래정보 불러오기
 func getSubscribedInfo(req ReqTransactionRecord) (string, int, string, int, error) {
 	tid := ""
 	amount := 0
@@ -70,4 +69,4 @@ func getSubscribedInfo(req ReqTransactionRecord) (string, int, string, int, erro
 	}
 
 	return tid, amount, transactionDate, handleError.SUCCESS, nil
-} // tid, amount, transactionDate return
+}

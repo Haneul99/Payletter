@@ -28,8 +28,6 @@ func Logout(c echo.Context) error {
 	}
 
 	// CheckParam
-	// 해당 accessToken이 유효한지 검사
-	// 해당 accessToken이 DB에 저장된 것과 동일한지 검사
 	if errCode, err := util.IsValidAccessToken(reqLogout.AccessToken, reqLogout.Username); err != nil {
 		return handleError.ReturnResFail(c, http.StatusUnauthorized, err, errCode)
 	}
@@ -44,7 +42,6 @@ func Logout(c echo.Context) error {
 	return c.JSON(http.StatusOK, resLogout)
 }
 
-// DB에서 AccessToken 삭제
 func deleteUserAccessToken(username string) (int, error) {
 	query := fmt.Sprintf("UPDATE USER SET accessToken = \"\" WHERE username = \"%s\"", username)
 	_, err := util.GetDB().Exec(query)

@@ -77,7 +77,6 @@ func PayletterCallback(c echo.Context) error {
 	return c.JSON(http.StatusOK, resPayletterCallback)
 }
 
-// 결제 성공 후 DB에 결제 정보 삽입
 func insertPayInfo(req ReqPayletterCallback) (int, error) {
 	OTTServiceId, err := strconv.Atoi(strings.Split(req.ProductName, "_")[0])
 	if err != nil {
