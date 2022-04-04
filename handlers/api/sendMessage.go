@@ -58,8 +58,8 @@ func waitTenSecond(req ReqSendMessage) (int, error) {
 	return handleError.SUCCESS, nil
 }
 
-// 가능한 경우의 수가 무엇이 있을까.. 무조건 성공해야함. return은 항상 Success로 해줄거기때문에
-// insertDB가 계속해서 실패하는 경우?
+// 1. Thread 조사
+// 2. 이거보다 더 가벼운 방법 찾기(Thread는 그대로 사용)
 
 // https://fransoaardi.github.io/posts/goroutine_lifecycle/
 // main이 아닌 func 내에서 호출된 goroutine 은 해당 func 가 종료되었더라도, 종료되지않고 독립된 lifecycle 을 가진다.

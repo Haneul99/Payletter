@@ -49,10 +49,10 @@ func RequestPayAPI(username string, platform string, membership string, OTTservi
 	reqPayletterRequestData.UserID = username
 	reqPayletterRequestData.Amount = amount
 	reqPayletterRequestData.ProductName = fmt.Sprintf("%d_%s_%s", OTTserviceId, platform, membership)
-	//reqPayletterRequestData.ReturnURL = "http://58.234.2.81:80/api/payletterReturn"
-	//reqPayletterRequestData.CallbackURL = "http://58.234.2.81:80/api/payletterCallback"
-	reqPayletterRequestData.ReturnURL = "http://127.0.0.1:8080/api/payletterReturn"
-	reqPayletterRequestData.CallbackURL = "http://127.0.0.1:8080/api/payletterCallback"
+	reqPayletterRequestData.ReturnURL = "http://58.234.2.81:80/api/payletterReturn"
+	reqPayletterRequestData.CallbackURL = "http://58.234.2.81:80/api/payletterCallback"
+	//reqPayletterRequestData.ReturnURL = "http://127.0.0.1:8080/api/payletterReturn"
+	//reqPayletterRequestData.CallbackURL = "http://127.0.0.1:8080/api/payletterCallback"
 	reqPayletterRequestData.CancelURL = "https://testpg.payletter.com/cancel"
 
 	jsonData, err := json.Marshal(reqPayletterRequestData)
